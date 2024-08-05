@@ -1,16 +1,10 @@
 <!-- src/views/Home.vue -->
 <template>
   <div class="home">
-    <ImageRankZone />
-    <ImageRankZone />
-    <ImageRankZone />
-    <ImageRankZone />
-    <ImageRankZone />
-    <ImageRankZone />
-    <ImageRankZone />
-    <ImageRankZone />
-    <ImageRankZone />
-    
+    <ImageRankZone :rankname=name1 :color=blue />
+    <ImageRankZone :rankname=name2 :color=blue />
+    <ImageRankZone :rankname=name1 :color=green />
+    <ImageRankZone :rankname=name1 :color=red />
     <SortableImageList />
   </div>
 </template>
@@ -25,6 +19,15 @@ export default {
     ImageRankZone,
     SortableImageList,
   },
+  data() {
+    return {
+      name1: 'red',
+      name2: 'blue',
+      red: 'red',
+      blue:'blue',
+      green: 'green'
+    }
+  }
 };
 </script>
 

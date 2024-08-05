@@ -1,7 +1,7 @@
 <!-- src/components/SortableImageList.vue -->
 <template>
   <div class="image-rank-zone">
-    <div class="list-name">老婆！！！</div>
+    <div class="list-name" :style="{'background-color': color}">{{ rankname }}</div>
     <draggable
       v-model="images"
       :options="{ animation: 200, direction: 'horizontal' }"
@@ -25,6 +25,7 @@ export default {
   components: {
     draggable
   },
+  props:['rankname', 'color'],
   data() {
     return {
       images: [{ src: '/1.jpg' }, { src: '/2.jpg' }]
@@ -52,6 +53,7 @@ export default {
 .image-rank-zone .list-name {
   display: inline-block;
   width: 10%;
+  background-color: white;
 }
 
 .image-rank-zone .image-list {

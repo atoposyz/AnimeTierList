@@ -5,6 +5,7 @@
         v-model="images"
         :options="{ animation: 200}"
         class="image-list"
+        group="anime"
       >
         <template #item="{ element }">
           <div class="image-item" :style="{ backgroundImage: `url(${element.src})` }"></div>
