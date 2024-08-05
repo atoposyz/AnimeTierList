@@ -1,8 +1,8 @@
 <!-- src/views/Home.vue -->
 <template>
   <div class="home">
-    <ImageRankZone :rankname=name1 :color=blue />
-    <ImageRankZone :rankname=name2 :color=blue />
+    <ImageRankZone :rankname=name1 />
+    <ImageRankZone :rankname=name2 />
     <ImageRankZone :rankname=name1 :color=green />
     <ImageRankZone :rankname=name1 :color=red />
     <SortableImageList />
