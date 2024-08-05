@@ -1,27 +1,40 @@
 <!-- src/views/Home.vue -->
 <template>
   <div class="home">
-    <DraggableImage imageSrc="/1.jpg" />
-    <DraggableImage imageSrc="/2.jpg" />
-    <DropZone />
+    <ImageRankZone />
+    <ImageRankZone />
+    <ImageRankZone />
+    <ImageRankZone />
+    <ImageRankZone />
+    <ImageRankZone />
+    <ImageRankZone />
+    <ImageRankZone />
+    <ImageRankZone />
+    
+    <SortableImageList />
   </div>
 </template>
 
 <script>
-import DraggableImage from '@/components/DraggableImage.vue';
-import DropZone from '@/components/DropZone.vue';
+
+import SortableImageList from '@/components/SortableImageList.vue';
+import ImageRankZone from '@/components/ImageRankZone.vue';
 
 export default {
   components: {
-    DraggableImage,
-    DropZone,
+    ImageRankZone,
+    SortableImageList,
   },
 };
 </script>
 
 <style scoped>
 .home {
-  display: flex;
+  display: block;
   gap: 20px;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 100px;
 }
 </style>
