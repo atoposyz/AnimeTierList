@@ -1,7 +1,9 @@
 <!-- src/components/SortableImageList.vue -->
 <template>
   <div class="image-rank-zone">
-    <div class="list-name" :style="{'background-color': color}">{{ rankname }}</div>
+    <div class="list-name" :style="{'background-color': color}" contenteditable="true">
+        <span class="label">{{ rankname }}</span>
+    </div>
     <draggable
       v-model="images"
       :options="{ animation: 200, direction: 'horizontal' }"
@@ -51,9 +53,17 @@ export default {
 }
 
 .image-rank-zone .list-name {
-  display: inline-block;
-  width: 10%;
+  display: flex;
+  width: 100px;
   background-color: white;
+  justify-content:center;
+  align-items: center;
+}
+
+.label {
+    text-align: center;
+    margin: 0 auto;
+    font-size: 15px;
 }
 
 .image-rank-zone .image-list {
@@ -64,8 +74,10 @@ export default {
 }
 
 .image-rank-zone .setting {
-  display: inline-block;
+  display: flex;
   width: 10%;
+  justify-content:center;
+  align-items: center
 }
 
 .image-rank-zone .image-item{
