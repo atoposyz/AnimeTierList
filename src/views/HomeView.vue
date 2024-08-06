@@ -1,11 +1,11 @@
 <!-- src/views/Home.vue -->
 <template>
   <div class="home">
-    <ImageRankZone :rankname=name1 />
-    <ImageRankZone :rankname=name2 />
-    <ImageRankZone :rankname=name1 :color=green />
-    <ImageRankZone :rankname=name1 :color=red />
-    <SortableImageList />
+    <SearchAnimeBox v-if="ifsearch" @closesearchbox="handleclosesearchbox" />
+    <template v-for="rankitem in ranklist" :key="rankitem.name">
+      <ImageRankZone :rankname=rankitem.name :color=rankitem.color />
+    </template>
+    <SortableImageList @opensearchbox="handleopensearchbox" />
   </div>
 </template>
 
@@ -13,19 +13,31 @@
 
 import SortableImageList from '@/components/SortableImageList.vue';
 import ImageRankZone from '@/components/ImageRankZone.vue';
+import SearchAnimeBox from '@/components/SearchAnimeBox.vue';
 
 export default {
   components: {
     ImageRankZone,
     SortableImageList,
+    SearchAnimeBox,
   },
   data() {
     return {
-      name1: 'red',
-      name2: 'blue',
-      red: 'red',
-      blue:'blue',
-      green: 'green'
+      ranklist: [
+        { name: "老婆！！", color: "OrangeRed " },
+        { name: "老婆！", color: "Orange" },
+        { name: "老婆？", color: "GoldenRod" },
+        { name: "朋友吧", color: "Gold" },
+        { name: "一般", color: "Gray" },],
+      ifsearch: false,
+    }
+  },
+  methods: {
+    handleopensearchbox() {
+      this.ifsearch = true
+    },
+    handleclosesearchbox() {
+      this.ifsearch = false
     }
   }
 };

@@ -1,17 +1,14 @@
 <!-- src/components/SortableImageList.vue -->
 <template>
   <div class="image-rank-zone">
-    <div class="list-name" :style="{'background-color': color}" contenteditable="true">
-        <span class="label">{{ rankname }}</span>
+    <div class="list-name" :style="{ 'background-color': color }" contenteditable="true">
+      <span class="label">{{ rankname }}</span>
     </div>
-    <draggable
-      v-model="images"
-      :options="{ animation: 200, direction: 'horizontal' }"
-      class="image-list"
-      group="anime"
-    >
+    <draggable v-model="images" :options="{ animation: 200, direction: 'horizontal' }" class="image-list" group="anime">
       <template #item="{ element }">
-        <div class="image-item" :style="{ backgroundImage: `url(${element.src})` }"></div>
+        <div class="image-item">
+          <img :src="element.src" alt="">
+        </div>
       </template>
     </draggable>
     <div class="setting" @click="addImage">
@@ -27,7 +24,7 @@ export default {
   components: {
     draggable
   },
-  props:['rankname', 'color'],
+  props: ['rankname', 'color'],
   data() {
     return {
       images: [{ src: '/1.jpg' }, { src: '/2.jpg' }]
@@ -56,15 +53,15 @@ export default {
   display: flex;
   width: 100px;
   background-color: white;
-  justify-content:center;
+  justify-content: center;
   align-items: center;
   min-height: 100px;
 }
 
 .label {
-    text-align: center;
-    margin: 0 auto;
-    font-size: 15px;
+  text-align: center;
+  margin: 0 auto;
+  font-size: 15px;
 }
 
 .image-rank-zone .image-list {
@@ -77,17 +74,25 @@ export default {
 .image-rank-zone .setting {
   display: flex;
   width: 10%;
-  justify-content:center;
+  justify-content: center;
   align-items: center
 }
 
-.image-rank-zone .image-item{
-  width: 100px;
+.image-rank-zone .image-item {
   height: 100px;
+  width: auto;
   background-size: cover;
   background-position: center;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.image-rank-zone .image-item img {
+  height: 100px;
+  width: auto;
+  align-items: center;
+  justify-content: center;
+  object-fit: cover;
 }
 </style>
