@@ -11,5 +11,16 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
+  },
+  build: {
+    outDir: 'dist', // 构建输出目录
+    rollupOptions: {
+      output: {
+        // 使所有资源（CSS、JS、图片等）都放在同一个目录下
+        assetFileNames: '[name][extname]',
+        chunkFileNames: '[name].js',
+        entryFileNames: '[name].js'
+      }
+    }
   }
 })
