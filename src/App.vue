@@ -72,6 +72,7 @@ export default {
     },
     captureimg() {
       const element = this.$refs.imageRankTable;
+      console.log(element)
       html2canvas(element).then(canvas => {
         const link = document.createElement('a');
         link.href = canvas.toDataURL('image/png');

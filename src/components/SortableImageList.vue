@@ -1,7 +1,7 @@
 <!-- src/components/SortableImageList.vue -->
 <template>
   <div class="sortable-image-list">
-    <ImageListZone />
+    <ImageListZone :newimage="newimageurl" />
     <div class="add-image" @click="addImage">
       <span>+</span>
     </div>
@@ -17,6 +17,7 @@ export default {
   },
   data() {
     return {
+      newimageurl: '',
       images: [
         // { src: '/1.jpg' },
         // { src: '/2.jpg' },
@@ -33,6 +34,7 @@ export default {
     handleData(url) {
       console.log("successfully received!")
       this.images.push({ src: url })
+      this.newimageurl = url
     },
     addImage() {
       this.$emit('opensearchbox');
@@ -43,6 +45,7 @@ export default {
 
 <style scoped>
 .sortable-image-list {
+  margin-top: 10px;
   min-height: 120px;
   display: flex;
   gap: 10px;
