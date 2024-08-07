@@ -1,11 +1,7 @@
 <!-- src/components/SortableImageList.vue -->
 <template>
   <div class="sortable-image-list">
-    <draggable v-model="images" :options="{ animation: 200 }" class="image-list" group="anime">
-      <template #item="{ element }">
-        <div class="image-item" :style="{ backgroundImage: `url(${element.src})` }"></div>
-      </template>
-    </draggable>
+    <ImageListZone />
     <div class="add-image" @click="addImage">
       <span>+</span>
     </div>
@@ -13,11 +9,11 @@
 </template>
 
 <script>
-import draggable from 'vuedraggable';
+import ImageListZone from './ImageListZone.vue';
 
 export default {
   components: {
-    draggable,
+    ImageListZone,
   },
   data() {
     return {
@@ -47,20 +43,13 @@ export default {
 
 <style scoped>
 .sortable-image-list {
+  min-height: 120px;
   display: flex;
   gap: 10px;
   min-width: 400px;
 }
 
-.sortable-image-list .image-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  min-width: 100px;
-}
-
-.sortable-image-list .image-item,
-.sortable-image-list .add-image {
+.add-image {
   width: 100px;
   height: 100px;
   background-size: cover;
@@ -68,12 +57,10 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.add-image {
   border: 2px dashed #ccc;
   cursor: pointer;
   background-color: #f0f0f0;
+  margin: auto 10px auto auto;
 }
 
 .add-image span {
