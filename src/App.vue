@@ -1,17 +1,24 @@
 <template>
   <div class="home">
-    <div class="in-output">
-      <button @click="changesave">{{ savetitle }}</button>
-      <button>导入</button>
-    </div>
-    <div class="save-as" v-if="ifsave">
-      <button>save as json</button>
-      <button>save as image</button>
+    <div class="opt">
+      <div class="in-output">
+        <button @click="changesave">{{ savetitle }}</button>
+        <button>导入</button>
+      </div>
+      <div class="save-as" v-show="ifsave">
+        <button>save as json</button>
+        <button @click="captureimg">save as image</button>
+      </div>
+      <div class="zhanweifu" v-show="!ifsave">
+        <button style="border: 0; background-color: rgba(0, 0, 0, 0);"></button>
+      </div>
     </div>
     <SearchAnimeBox v-if="ifsearch" @closesearchbox="handleclosesearchbox" />
-    <template v-for="rankitem in ranklist" :key="rankitem.name">
-      <ImageRankZone :rankname=rankitem.name :color=rankitem.color />
-    </template>
+    <div ref="imageRankTable" class="imageranktable">
+      <template v-for="rankitem in ranklist" :key="rankitem.name">
+        <ImageRankZone :rankname=rankitem.name :color=rankitem.color />
+      </template>
+    </div>
     <SortableImageList @opensearchbox="handleopensearchbox" />
   </div>
   <AppFooter />
@@ -23,6 +30,7 @@ import SortableImageList from '@/components/SortableImageList.vue';
 import ImageRankZone from '@/components/ImageRankTable.vue';
 import SearchAnimeBox from '@/components/SearchAnimeBox.vue';
 import AppFooter from './components/Footer.vue';
+import html2canvas from 'html2canvas';
 
 export default {
   components: {
@@ -62,6 +70,15 @@ export default {
       this.ifsave = !this.ifsave
       this.updatesavetitle()
     },
+    captureimg() {
+      const element = this.$refs.imageRankTable;
+      html2canvas(element).then(canvas => {
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png');
+        link.download = 'ImageRankTable.png';
+        link.click();
+      })
+    }
   }
 };
 </script>
@@ -73,6 +90,16 @@ export default {
   max-width: 1000px;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 100px;
+  margin-top: 50px;
+}
+
+.opt {
+  margin-bottom: 20px;
+  text-align: right;
+  margin-right: 5px;
+}
+
+.imageranktable {
+  margin-top: 50px;
 }
 </style>

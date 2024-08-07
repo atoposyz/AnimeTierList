@@ -17,11 +17,12 @@ export default {
     components: {
         draggable,
     },
+    props: ['image'],//TODO
     data() {
         return {
             images: [
-                { src: '/1.jpg' },
-                { src: '/2.jpg' },
+                // { src: '/1.jpg' },
+                // { src: '/2.jpg' },
             ],
         };
     },
@@ -36,6 +37,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     gap: 2px;
+    width: 100%;
 }
 
 .image-item {

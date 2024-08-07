@@ -12,6 +12,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "html2canvas": "^1.4.1",
     "mitt": "^3.0.1",
     "vue": "^3.4.29",
     "vue-router": "^4.3.3",
