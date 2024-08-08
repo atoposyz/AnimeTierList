@@ -17,7 +17,7 @@ export default {
     components: {
         draggable,
     },
-    props: ['newimage'],//TODO
+    props: ['newimage', 'newimages'],//TODO
     data() {
         return {
             images: [
@@ -28,8 +28,10 @@ export default {
     },
     watch: {
         newimage(newurl) {
-            this.addurl(newurl)
-            console.log(newurl)
+            this.addurl(newurl);
+        },
+        newimages(newurls) {
+            this.images = newurls;
         }
     },
     methods: {
