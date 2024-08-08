@@ -1,6 +1,6 @@
 <!-- src/components/ImageListZone.vue -->
 <template>
-    <draggable v-model="images" :options="{ animation: 200 }" class="image-list" group="anime">
+    <draggable v-model="images" :options="{ animation: 200 }" class="image-list" group="anime" @change="on_drag_end">
         <template #item="{ element }">
             <div class="image-item">
                 <img :src="element.src" alt="">
@@ -35,9 +35,16 @@ export default {
         }
     },
     methods: {
+        emit_change_event(data) {
+            this.$emit("change-event", data);
+        },
+        on_drag_end(data) { // 拖拽结束时，发射信号
+            this.emit_change_event(data);
+        },
         addurl(url) {
             this.images.push({ src: url })
-            console.log('get new url!')
+            console.log('get new url!');
+            this.emit_change_event();
         }
     },
 };
