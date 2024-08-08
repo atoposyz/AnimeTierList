@@ -4,7 +4,7 @@
     <div class="rank-name" :style="{ 'background-color': color }" contenteditable="true">
       <span class="label">{{ rankname }}</span>
     </div>
-    <ImageListZone class="image-list" :newimages="images" />
+    <ImageListZone class="image-list" :newimages="images" @change-event="emit_change_event"/>
     <div class="settings" @click="settings">
       <span>settings</span>
     </div>
@@ -30,11 +30,16 @@ export default {
     },
   },
   methods: {
+    emit_change_event(data) {
+      this.$emit("change-event", data);
+    },
     settings() {
       const newImageSrc = prompt('请输入新图片的URL:')
       if (newImageSrc) {
         this.images.push({ src: newImageSrc })
       }
+      // 此处信息发生了改变，应该考虑更新 cookie
+      this.emit_change_event("");
     }
   }
 }

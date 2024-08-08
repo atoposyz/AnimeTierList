@@ -1,11 +1,12 @@
 <template>
-	<div class="home">
+	<div class="home" @mouseup="change_event_handler">
 		<div class="opt">
 			<div class="in-output">
 				<button @click="changesave" v-show="!ifimport">{{ savetitle }}</button>
 				<button @click="changeimport" v-show="!ifsave">{{ importtitle }}</button>
 			</div>
 			<div class="save-as" v-show="ifsave">
+				<button @click="save_data_into_cookie">{{ cache_title }}</button>
 				<button @click="savejson">json</button>
 				<button @click="captureimg">image</button>
 			</div>
@@ -20,13 +21,16 @@
 
 		<SearchAnimeBox v-if="ifsearch" @closesearchbox="handleclosesearchbox" />
 
-		<div ref="imageRankTable" class="imageranktable">
+		<div ref="imageRankTable" id="imageRankTable" class="imageranktable">
 			<template v-for="rankitem in ranklist" :key="rankitem.name">
-				<ImageRankTable :rankname="rankitem.name" :color="rankitem.color" :imgurl="rankitem.urls" />
+				<ImageRankTable :rankname="rankitem.name" :color="rankitem.color" :imgurl="rankitem.urls"/>
 			</template>
 		</div>
 
-		<SortableImageList @opensearchbox="handleopensearchbox" />
+		<div>
+			<SortableImageList ref="sortableImageList" id="sortableImageList" @opensearchbox="handleopensearchbox"/>
+		</div>
+		
 
 		<div ref="combinedContainer" class="combined-container" style="display: none"></div>
 	</div>
@@ -39,6 +43,7 @@ import ImageRankTable from '@/components/ImageRankTable.vue';
 import SearchAnimeBox from '@/components/SearchAnimeBox.vue';
 import AppFooter from './components/Footer.vue';
 import html2canvas from 'html2canvas';
+import Cookies from 'js-cookie'
 
 export default {
 	components: {
@@ -49,6 +54,7 @@ export default {
 	},
 	data() {
 		return {
+			empty_ranklist: [],
 			ranklist: [
 				{ name: "老婆！！", color: "OrangeRed ", urls: [] },
 				{ name: "老婆！", color: "Orange", urls: [] },
@@ -60,11 +66,28 @@ export default {
 			ifsave: false,
 			ifimport: false,
 			savetitle: '保存',
+			cache_title: '网页缓存',
 			importtitle: "导入",
 			importjson: [],
 		}
 	},
+	mounted() {
+		this.empty_ranklist = JSON.parse(JSON.stringify(this.ranklist)); // 记录初始值
+		this.load_data_from_cookie();                                    // 初始化时：试图从 cookie 加载上次的历史信息
+	},
 	methods: {
+		change_event_handler() {
+			
+		},
+		clear_ranklist() { // 清空整个 ranklist
+			this.ranklist = JSON.parse(JSON.stringify(this.empty_ranklist));
+		},
+		set_cookie(name, value) {
+			Cookies.set(name, value, { expires: 30 }); // 30 天后过期
+		},
+		get_cookie(name) {
+			return Cookies.get(name); // 获取指定名称的 cookie
+		},
 		handleopensearchbox() {
 			this.ifsearch = true
 		},
@@ -90,6 +113,38 @@ export default {
 				this.importtitle = "导入"
 			}
 		},
+		save_data_into_cookie(flag=true) {
+			this.set_cookie("save", this.get_json_presentation());
+			this.set_cookie("sort", this.get_sortable_data());
+			console.log("saving data into cookie."); // 初始化时可能会遇到很多次更新，不过应该不影响功能
+			if(flag) {
+				alert("已保存！");
+			}
+		},
+		load_main_data() {
+			const json_string = this.get_cookie("save");
+			if(json_string == null || json_string == "") {  // 当前没有可用 json
+				this.save_data_into_cookie(false);               // 存一个进去
+				return;
+			}
+			const json_object = JSON.parse(json_string);
+			this.loadjson(json_object);
+			console.log("load main data from cookie.");
+		},
+		load_sort_data() {
+			const json_string = this.get_cookie("sort");
+			if(json_string == null || json_string == "") {  // 当前没有可用 json
+				this.save_data_into_cookie(false);               // 存一个进去
+				return;
+			}
+			const json_object = JSON.parse(json_string);
+			this.loadsortjson(json_object);
+			console.log("load sort data from cookie.");
+		},
+		load_data_from_cookie() {
+			this.load_main_data();
+			this.load_sort_data();
+		},
 		captureimg() {
 			const element = this.$refs.imageRankTable;
 			html2canvas(element, { useCORS: true }).then(canvas => {
@@ -100,18 +155,40 @@ export default {
 			});
 			this.changesave();
 		},
-		savejson() {
-			const element = this.$refs.imageRankTable;
+		get_json_presentation() {
+			const element = document.getElementById("imageRankTable");
 			const rows = element.querySelectorAll(".image-rank-row")
 			const data = Array.from(rows).map(item => {
 				return {
 					rowname: item.querySelector(".label").innerHTML,
 					rowurl: Array.from(item.querySelectorAll("img")).map(imgitem => {
-						return { src: imgitem.src }
+						return { src: imgitem.src };
 					})
 				}
 			})
-			const json = JSON.stringify(data, null, 2);
+			const json = JSON.stringify(data, null, 2); // this is a string
+			return json;
+		},
+		get_sortable_data() { // 获得排序缓冲区的数据
+			const element = document.getElementById("sortableImageList");
+			const items = element.querySelectorAll(".image-item");
+			const data = Array.from(items).map(imgitem => {
+				const content = imgitem.innerHTML;
+				const regex = /src\s*=\s*(\'|\")[^\s]*(\'|\")/ig;
+				const match = regex.exec(content)[0];
+				const regex2 = /(\'|\")[^\s]*(\'|\")/ig
+				const match2 = regex2.exec(match)[0];
+				const real_src = match2.substring(1, match2.length - 1);
+				return {src: real_src};
+			});
+			const json = JSON.stringify(data, null, 2); // this is a string
+			return json;
+		},
+		savejson() {
+			const json = JSON.stringify({
+				save: JSON.parse(this.get_json_presentation()),
+				sort: JSON.parse(this.get_sortable_data())
+			}, null, 2);
 			const blob = new Blob([json], { type: 'application/json' });
 			const url = URL.createObjectURL(blob);
 			const a = document.createElement('a');
@@ -121,13 +198,20 @@ export default {
 			URL.revokeObjectURL(url);
 			this.changesave();
 		},
-		loadjson() {
-			// this.ranklist = []
-			for (var i = 0; i < this.importjson.length; i++) {
-				this.ranklist[i].name = this.importjson[i].rowname;
-				this.ranklist[i].urls = this.importjson[i].rowurl;
+		loadjson(json_object) {
+			this.importjson = json_object; 
+			for (var i = 0; i < json_object.length; i++) {
+				this.ranklist[i].name = json_object[i].rowname;
+				this.ranklist[i].urls = json_object[i].rowurl;
 			}
-			this.changeimport();
+		},
+		loadsortjson(json_object) {
+			const element = this.$refs.sortableImageList;
+			element.images = [];
+			for(var i = 0; i < json_object.length; i += 1) {
+				const url = json_object[i].src;
+				element.handleData(url);
+			}
 		},
 		importnew() {
 
@@ -140,8 +224,10 @@ export default {
 
 					reader.onload = (e) => {
 						try {
-							this.importjson = JSON.parse(e.target.result); // Parse JSON data
-							this.loadjson();
+							const json_file = JSON.parse(e.target.result);
+							this.loadjson(json_file.save); // Parse JSON data
+							this.loadsortjson(json_file.sort);
+							this.changeimport();
 						} catch (error) {
 							console.error('Error parsing JSON:', error);
 						}

@@ -1,7 +1,7 @@
 <!-- src/components/SortableImageList.vue -->
 <template>
   <div class="sortable-image-list">
-    <ImageListZone :newimage="newimageurl" />
+    <ImageListZone ref="imageListZone" :newimage="newimageurl" @change-evnt="emit_change_event"/>
     <div class="add-image" @click="addImage">
       <span>+</span>
     </div>
@@ -31,10 +31,14 @@ export default {
     this.$bus.off('dataSent', this.handleData);
   },
   methods: {
+    emit_change_event(data) {
+      this.$emit("change-event", data);
+    },
     handleData(url) {
-      console.log("successfully received!")
-      this.images.push({ src: url })
-      this.newimageurl = url
+      console.log("successfully received!");
+      this.images.push({ src: url });
+      this.$refs.imageListZone.addurl(url);
+      this.emit_change_event("");
     },
     addImage() {
       this.$emit('opensearchbox');
