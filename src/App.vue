@@ -16,10 +16,11 @@
     <SearchAnimeBox v-if="ifsearch" @closesearchbox="handleclosesearchbox" />
     <div ref="imageRankTable" class="imageranktable">
       <template v-for="rankitem in ranklist" :key="rankitem.name">
-        <ImageRankZone :rankname=rankitem.name :color=rankitem.color />
+        <ImageRankTable :rankname=rankitem.name :color=rankitem.color />
       </template>
     </div>
     <SortableImageList @opensearchbox="handleopensearchbox" />
+    <div ref="combinedContainer" class="combined-container" style="display: none;"></div>
   </div>
   <AppFooter />
 </template>
@@ -27,14 +28,14 @@
 <script>
 
 import SortableImageList from '@/components/SortableImageList.vue';
-import ImageRankZone from '@/components/ImageRankTable.vue';
+import ImageRankTable from '@/components/ImageRankTable.vue';
 import SearchAnimeBox from '@/components/SearchAnimeBox.vue';
 import AppFooter from './components/Footer.vue';
 import html2canvas from 'html2canvas';
 
 export default {
   components: {
-    ImageRankZone,
+    ImageRankTable,
     SortableImageList,
     SearchAnimeBox,
     AppFooter,
@@ -72,8 +73,9 @@ export default {
     },
     captureimg() {
       const element = this.$refs.imageRankTable;
-      console.log(element)
-      html2canvas(element).then(canvas => {
+      html2canvas(element, {
+        useCORS: true
+      }).then(canvas => {
         const link = document.createElement('a');
         link.href = canvas.toDataURL('image/png');
         link.download = 'ImageRankTable.png';

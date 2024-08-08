@@ -1,6 +1,6 @@
 <!-- src/components/SortableImageList.vue -->
 <template>
-  <div class="image-rank-zone">
+  <div class="image-rank-row">
     <div class="rank-name" :style="{ 'background-color': color }" contenteditable="true">
       <span class="label">{{ rankname }}</span>
     </div>
@@ -36,7 +36,7 @@ export default {
 </script>
 
 <style scoped>
-.image-rank-zone {
+.image-rank-row {
   min-height: 120px;
   display: flex;
   gap: 2px;
@@ -59,14 +59,14 @@ export default {
   font-size: 15px;
 }
 
-.image-rank-zone .image-list {
+.image-rank-row .image-list {
   display: flex;
   flex-wrap: wrap;
   width: 80%;
   gap: 2px;
 }
 
-.image-rank-zone .settings {
+.image-rank-row .settings {
   display: flex;
   width: 10%;
   justify-content: center;

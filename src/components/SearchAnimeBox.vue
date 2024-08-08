@@ -36,6 +36,43 @@ export default {
             imageurls: [],
         }
     },
+    mounted() {
+        this.Caches = [
+            {
+                "id": 464376,
+                "title": "败犬女主太多了！"
+            },
+            {
+                "id": 389156,
+                "title": "地。-关于地球的运动-"
+            },
+            {
+                "id": 431767,
+                "title": "GIRLS BAND CRY"
+            },
+            {
+                "id": 395378,
+                "title": "迷宫饭"
+            },
+            {
+                "id": 372010,
+                "title": "狼与香辛料 行商邂逅贤狼"
+            },
+            {
+                "id": 404809,
+                "title": "末日列车去哪里？"
+            },
+            {
+                "id": 429644,
+                "title": "名侦探柯南：百万美元的五棱星"
+            },
+            {
+                "id": 448478,
+                "title": "失忆投捕"
+            }
+        ]
+        this.resetAnimeList(this.Caches)
+    },
     methods: {
         async get(url) {
             if (this.Caches[url]) return this.Caches[url];
@@ -93,6 +130,9 @@ export default {
         }
     }
 }
+
+
+
 </script>
 
 <style scoped>
