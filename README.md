@@ -1,41 +1,30 @@
 # AnimeTireList
 
-This template should help get you started developing with Vue 3 in Vite.
+一个只有每年年末才有用的动画tierlist
 
-## Recommended IDE Setup
+## TODO
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+### 搜索功能有点菜了：
+- 添加一个根据`bgm id`的精确搜索
+- 添加一个直接根据网址传图片的功能，但是不保证能保存为图片
 
-## Customize configuration
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+### settings添加功能：
 
-## Project Setup
+- 添加行
+- 换颜色
+- 修改行名称
+- 删除行
 
-```sh
-npm install
-```
+### 美化
 
-### Compile and Hot-Reload for Development
+### 保存
 
-```sh
-npm run dev
-```
+- 保存图片功能想办法把右边的setting去掉
+- json只保存id
 
-### Compile and Minify for Production
+### 导入
 
-```sh
-npm run build
-```
+- 自动爬取个人某年已看动画 https://github.com/Shell32-Natsu/bangumi_yearly_report
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-npm run test:unit
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+暂时先想这些
