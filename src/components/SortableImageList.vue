@@ -1,7 +1,7 @@
 <!-- src/components/SortableImageList.vue -->
 <template>
   <div class="sortable-image-list">
-    <ImageListZone ref="imageListZone" :newimage="newimageurl" @change-evnt="emit_change_event"/>
+    <ImageListZone ref="imageListZone" :newimages="images" @change-evnt="emit_change_event"/>
     <div class="add-image" @click="addImage">
       <span>+</span>
     </div>
@@ -15,34 +15,14 @@ export default {
   components: {
     ImageListZone,
   },
+  props: ["images"],
   data() {
     return {
-      newimageurl: '',
-      images: [
-        // { src: '/1.jpg' },
-        // { src: '/2.jpg' },
-      ],
     };
-  },
-  mounted() {
-    this.$bus.on('dataSent', this.handleData);
-  },
-  beforeUnmount() {
-    this.$bus.off('dataSent', this.handleData);
   },
   methods: {
     emit_change_event(data) {
       this.$emit("change-event", data);
-    },
-    clear() { // 清空一行内容
-      this.images = [];
-      console.log("clear sort image list.");
-    },
-    handleData(url) {
-      console.log("successfully received!");
-      this.images.push({ src: url });
-      this.$refs.imageListZone.addurl(url);
-      this.emit_change_event("");
     },
     addImage() {
       this.$emit('opensearchbox');
