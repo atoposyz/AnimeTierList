@@ -4,7 +4,7 @@
 
 ## 食用方法
 
-1. 点击<a href="atoposyz.github.io/anime-rank/.html">链接</a>即可使用
+1. 点击<a href="atoposyz.github.io/anime-rank/index.html">链接</a>即可使用
 2. 当您发现网页在搜索动画和展示图片不尽人意时，可以选择手动构建来提高浏览体验
 
 ### 提高浏览体验
