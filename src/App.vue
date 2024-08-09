@@ -2,6 +2,7 @@
 	<div class="home" @mouseup="change_event_handler">
 		<div class="opt">
 			<div class="in-output">
+				<button @click="clearcontent">{{ cleartitle }}</button>
 				<button @click="changesave" v-show="!ifimport">{{ savetitle }}</button>
 				<button @click="changeimport" v-show="!ifsave">{{ importtitle }}</button>
 			</div>
@@ -22,14 +23,14 @@
 		<SearchAnimeBox v-if="ifsearch" @closesearchbox="handleclosesearchbox" />
 
 		<div ref="imageRankTable" id="imageRankTable" class="imageranktable">
-			<template v-for="rankitem in ranklist" :key="rankitem.name">
+			<template v-for="rankitem in ranklist" :key="rankitem">
 				<ImageRankTable :rankname="rankitem.name" :index="rankitem.index" :color="rankitem.color"
 					:imgurl="rankitem.urls" />
 			</template>
 		</div>
 
 		<div>
-			<SortableImageList ref="sortableImageList" id="sortableImageList" @opensearchbox="handleopensearchbox" />
+			<SortableImageList :images="sortable_images_urls" ref="sortableImageList" id="sortableImageList" @opensearchbox="handleopensearchbox" />
 		</div>
 
 
@@ -63,21 +64,32 @@ export default {
 				{ name: "朋友吧", index: 3, color: "Gold", urls: [] },
 				{ name: "一般", index: 4, color: "Gray", urls: [] },
 			],
+			sortable_images_urls: [],
 			ifsearch: false,
 			ifsave: false,
 			ifimport: false,
 			savetitle: '保存',
 			cache_title: '网页缓存',
 			importtitle: "导入",
+			cleartitle: '清空',
 		}
 	},
 	mounted() {
 		this.empty_ranklist = JSON.parse(JSON.stringify(this.ranklist)); // 记录初始值
 		this.load_data_from_cookie();                                    // 初始化时：试图从 cookie 加载上次的历史信息
+		this.$bus.on("dataSent", this.add_new_image_into_sorted);
+	},
+	beforeUnmount() {
+		this.$bus.off("dataSent");
 	},
 	methods: {
 		change_event_handler() {
 
+		},
+		add_new_image_into_sorted(new_anime_image_url) {
+			this.sortable_images_urls.push({
+				src: new_anime_image_url
+			});
 		},
 		clear_ranklist() { // 清空整个 ranklist
 			this.ranklist = JSON.parse(JSON.stringify(this.empty_ranklist));
@@ -113,7 +125,7 @@ export default {
 		save_data_into_cookie(flag = true) {
 			this.set_cookie("save", this.get_json_presentation());
 			this.set_cookie("sort", this.get_sortable_data());
-			console.log("saving data into cookie."); // 初始化时可能会遇到很多次更新，不过应该不影响功能
+			console.log("saving data into cookie.");
 			if (flag) {
 				alert("已保存！");
 			}
@@ -121,7 +133,7 @@ export default {
 		load_main_data_from_cookie() {
 			const json_string = this.get_cookie("save");
 			if (json_string == null || json_string == "") {  // 当前没有可用 json
-				this.save_data_into_cookie(false);               // 存一个进去
+				this.save_data_into_cookie(false);           // 存一个进去
 				return;
 			}
 			const json_object = JSON.parse(json_string);
@@ -131,7 +143,7 @@ export default {
 		load_sort_data_from_cookie() {
 			const json_string = this.get_cookie("sort");
 			if (json_string == null || json_string == "") {  // 当前没有可用 json
-				this.save_data_into_cookie(false);               // 存一个进去
+				this.save_data_into_cookie(false);           // 存一个进去
 				return;
 			}
 			const json_object = JSON.parse(json_string);
@@ -171,9 +183,9 @@ export default {
 			const items = element.querySelectorAll(".image-item");
 			const data = Array.from(items).map(imgitem => {
 				const content = imgitem.innerHTML;
-				const regex = /src\s*=\s*(\'|\")[^\s]*(\'|\")/ig;
+				const regex = /src\s*=\s*('|")[^\s]*('|")/ig;
 				const match = regex.exec(content)[0];
-				const regex2 = /(\'|\")[^\s]*(\'|\")/ig
+				const regex2 = /('|")[^\s]*('|")/ig
 				const match2 = regex2.exec(match)[0];
 				const real_src = match2.substring(1, match2.length - 1);
 				return { src: real_src };
@@ -197,21 +209,25 @@ export default {
 		},
 		loadjson(json_object) {
 			const importjson = JSON.parse(JSON.stringify(json_object));
-			for (var i = 0; i < importjson.length; i++) {
-				const string_data = JSON.stringify({
-					index: i,
-					name: importjson[i].rowname,
-					url: importjson[i].rowurl
-				});
-				this.$bus.emit('loadUrlList', string_data);
+			if(importjson.length) {
+				for (var i = 0; i < importjson.length; i++) {
+					this.ranklist[i].name = importjson[i].rowname;
+					this.ranklist[i].urls = importjson[i].rowurl;
+				}
+			}
+		},
+		clearcontent() {
+			for (var i = 0; i < this.ranklist.length; i++) {
+				this.ranklist[i].urls = [];
 			}
 		},
 		loadsortjson(json_object) {
-			const element = this.$refs.sortableImageList;
-			element.clear();
+			this.sortable_images_urls = [];
 			for (var i = 0; i < json_object.length; i += 1) {
 				const url = json_object[i].src;
-				this.$bus.emit('dataSent', url);
+				this.sortable_images_urls.push({
+					src: url
+				})
 			}
 		},
 		importnew() {

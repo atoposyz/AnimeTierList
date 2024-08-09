@@ -92,7 +92,6 @@ export default {
             if (keyword) url = url + `?keyword=${encodeURIComponent(keyword)}`;
 
             const animes = await this.get(url);
-            console.log(animes)
             this.resetAnimeList(animes);
         },
 
@@ -109,14 +108,8 @@ export default {
                     id: anime.id,
                     url: url,
                     title: anime.title
-                }
+                };
             })
-            console.log(this.imageurls)
-            // for (var item in animes) {
-            //     this.imageurls.push(ImageURL + item.id + '/image?type=common')
-            // }
-            // this.$bus.emit('dataFetched', this.imageurls);
-            // this.imageurls = []
         },
 
         selectanime(animeurl) {
