@@ -10,7 +10,6 @@
 
 <script>
 import ImageListZone from './ImageListZone.vue';
-import { store } from '@/utils/store.js'
 
 export default {
   components: {
@@ -18,7 +17,6 @@ export default {
   },
   data() {
     return {
-      store,
     };
   },
   methods: {
