@@ -23,14 +23,15 @@
 
 		<div ref="imageRankTable" id="imageRankTable" class="imageranktable">
 			<template v-for="rankitem in ranklist" :key="rankitem.name">
-				<ImageRankTable :rankname="rankitem.name" :index="rankitem.index" :color="rankitem.color" :imgurl="rankitem.urls"/>
+				<ImageRankTable :rankname="rankitem.name" :index="rankitem.index" :color="rankitem.color"
+					:imgurl="rankitem.urls" />
 			</template>
 		</div>
 
 		<div>
-			<SortableImageList ref="sortableImageList" id="sortableImageList" @opensearchbox="handleopensearchbox"/>
+			<SortableImageList ref="sortableImageList" id="sortableImageList" @opensearchbox="handleopensearchbox" />
 		</div>
-		
+
 
 		<div ref="combinedContainer" class="combined-container" style="display: none"></div>
 	</div>
@@ -76,7 +77,7 @@ export default {
 	},
 	methods: {
 		change_event_handler() {
-			
+
 		},
 		clear_ranklist() { // 清空整个 ranklist
 			this.ranklist = JSON.parse(JSON.stringify(this.empty_ranklist));
@@ -88,41 +89,38 @@ export default {
 			return Cookies.get(name); // 获取指定名称的 cookie
 		},
 		handleopensearchbox() {
-			this.ifsearch = true
+			this.ifsearch = true;
 		},
 		handleclosesearchbox() {
-			this.ifsearch = false
-		},
-		updatesavetitle() {
-			if (this.ifsave) {
-				this.savetitle = '取消'
-			} else {
-				this.savetitle = '保存'
-			}
+			this.ifsearch = false;
 		},
 		changesave() {
-			this.ifsave = !this.ifsave
-			this.updatesavetitle()
-		},
-		changeimport() {
-			this.ifimport = !this.ifimport
-			if (this.ifimport) {
-				this.importtitle = "取消"
+			this.ifsave = !this.ifsave;
+			if (this.ifsave) {
+				this.savetitle = '取消';
 			} else {
-				this.importtitle = "导入"
+				this.savetitle = '保存';
 			}
 		},
-		save_data_into_cookie(flag=true) {
+		changeimport() {
+			this.ifimport = !this.ifimport;
+			if (this.ifimport) {
+				this.importtitle = "取消";
+			} else {
+				this.importtitle = "导入";
+			}
+		},
+		save_data_into_cookie(flag = true) {
 			this.set_cookie("save", this.get_json_presentation());
 			this.set_cookie("sort", this.get_sortable_data());
 			console.log("saving data into cookie."); // 初始化时可能会遇到很多次更新，不过应该不影响功能
-			if(flag) {
+			if (flag) {
 				alert("已保存！");
 			}
 		},
 		load_main_data_from_cookie() {
 			const json_string = this.get_cookie("save");
-			if(json_string == null || json_string == "") {  // 当前没有可用 json
+			if (json_string == null || json_string == "") {  // 当前没有可用 json
 				this.save_data_into_cookie(false);               // 存一个进去
 				return;
 			}
@@ -132,7 +130,7 @@ export default {
 		},
 		load_sort_data_from_cookie() {
 			const json_string = this.get_cookie("sort");
-			if(json_string == null || json_string == "") {  // 当前没有可用 json
+			if (json_string == null || json_string == "") {  // 当前没有可用 json
 				this.save_data_into_cookie(false);               // 存一个进去
 				return;
 			}
@@ -178,7 +176,7 @@ export default {
 				const regex2 = /(\'|\")[^\s]*(\'|\")/ig
 				const match2 = regex2.exec(match)[0];
 				const real_src = match2.substring(1, match2.length - 1);
-				return {src: real_src};
+				return { src: real_src };
 			});
 			const json = JSON.stringify(data, null, 2); // this is a string
 			return json;
@@ -211,7 +209,7 @@ export default {
 		loadsortjson(json_object) {
 			const element = this.$refs.sortableImageList;
 			element.clear();
-			for(var i = 0; i < json_object.length; i += 1) {
+			for (var i = 0; i < json_object.length; i += 1) {
 				const url = json_object[i].src;
 				this.$bus.emit('dataSent', url);
 			}
