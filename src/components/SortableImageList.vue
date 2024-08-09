@@ -34,6 +34,10 @@ export default {
     emit_change_event(data) {
       this.$emit("change-event", data);
     },
+    clear() { // 清空一行内容
+      this.images = [];
+      console.log("clear sort image list.");
+    },
     handleData(url) {
       console.log("successfully received!");
       this.images.push({ src: url });

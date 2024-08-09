@@ -23,7 +23,7 @@
 
 		<div ref="imageRankTable" id="imageRankTable" class="imageranktable">
 			<template v-for="rankitem in ranklist" :key="rankitem.name">
-				<ImageRankTable :rankname="rankitem.name" :color="rankitem.color" :imgurl="rankitem.urls"/>
+				<ImageRankTable :rankname="rankitem.name" :index="rankitem.index" :color="rankitem.color" :imgurl="rankitem.urls"/>
 			</template>
 		</div>
 
@@ -56,11 +56,11 @@ export default {
 		return {
 			empty_ranklist: [],
 			ranklist: [
-				{ name: "老婆！！", color: "OrangeRed ", urls: [] },
-				{ name: "老婆！", color: "Orange", urls: [] },
-				{ name: "老婆？", color: "GoldenRod", urls: [] },
-				{ name: "朋友吧", color: "Gold", urls: [] },
-				{ name: "一般", color: "Gray", urls: [] },
+				{ name: "老婆！！", index: 0, color: "OrangeRed ", urls: [] },
+				{ name: "老婆！", index: 1, color: "Orange", urls: [] },
+				{ name: "老婆？", index: 2, color: "GoldenRod", urls: [] },
+				{ name: "朋友吧", index: 3, color: "Gold", urls: [] },
+				{ name: "一般", index: 4, color: "Gray", urls: [] },
 			],
 			ifsearch: false,
 			ifsave: false,
@@ -68,7 +68,6 @@ export default {
 			savetitle: '保存',
 			cache_title: '网页缓存',
 			importtitle: "导入",
-			importjson: [],
 		}
 	},
 	mounted() {
@@ -121,7 +120,7 @@ export default {
 				alert("已保存！");
 			}
 		},
-		load_main_data() {
+		load_main_data_from_cookie() {
 			const json_string = this.get_cookie("save");
 			if(json_string == null || json_string == "") {  // 当前没有可用 json
 				this.save_data_into_cookie(false);               // 存一个进去
@@ -131,7 +130,7 @@ export default {
 			this.loadjson(json_object);
 			console.log("load main data from cookie.");
 		},
-		load_sort_data() {
+		load_sort_data_from_cookie() {
 			const json_string = this.get_cookie("sort");
 			if(json_string == null || json_string == "") {  // 当前没有可用 json
 				this.save_data_into_cookie(false);               // 存一个进去
@@ -142,8 +141,8 @@ export default {
 			console.log("load sort data from cookie.");
 		},
 		load_data_from_cookie() {
-			this.load_main_data();
-			this.load_sort_data();
+			this.load_main_data_from_cookie();
+			this.load_sort_data_from_cookie();
 		},
 		captureimg() {
 			const element = this.$refs.imageRankTable;
@@ -199,18 +198,22 @@ export default {
 			this.changesave();
 		},
 		loadjson(json_object) {
-			this.importjson = json_object; 
-			for (var i = 0; i < json_object.length; i++) {
-				this.ranklist[i].name = json_object[i].rowname;
-				this.ranklist[i].urls = json_object[i].rowurl;
+			const importjson = JSON.parse(JSON.stringify(json_object));
+			for (var i = 0; i < importjson.length; i++) {
+				const string_data = JSON.stringify({
+					index: i,
+					name: importjson[i].rowname,
+					url: importjson[i].rowurl
+				});
+				this.$bus.emit('loadUrlList', string_data);
 			}
 		},
 		loadsortjson(json_object) {
 			const element = this.$refs.sortableImageList;
-			element.images = [];
+			element.clear();
 			for(var i = 0; i < json_object.length; i += 1) {
 				const url = json_object[i].src;
-				element.handleData(url);
+				this.$bus.emit('dataSent', url);
 			}
 		},
 		importnew() {

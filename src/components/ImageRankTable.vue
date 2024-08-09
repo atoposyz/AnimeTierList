@@ -4,7 +4,7 @@
     <div class="rank-name" :style="{ 'background-color': color }" contenteditable="true">
       <span class="label">{{ rankname }}</span>
     </div>
-    <ImageListZone class="image-list" :newimages="images" @change-event="emit_change_event"/>
+    <ImageListZone class="image-list" :newimages="images" :index="index" @change-event="emit_change_event"/>
     <div class="settings" @click="settings">
       <span>settings</span>
     </div>
@@ -18,7 +18,7 @@ export default {
   components: {
     ImageListZone,
   },
-  props: ['rankname', 'color', 'imgurl'],
+  props: ['rankname', 'index', 'color', 'imgurl'],
   data() {
     return {
       images: []
