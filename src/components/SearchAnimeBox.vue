@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import { store } from '@/utils/store.js'
 const APIURL = `https://lab.magiconch.com/api/bangumi/`;
 const CORSurl = `https://proxyz-tau.vercel.app/api/proxy-image?url=`;
 const ImageURL = `https://api.bgm.tv/v0/subjects/`;
@@ -31,6 +32,7 @@ const ImageURL = `https://api.bgm.tv/v0/subjects/`;
 export default {
     data() {
         return {
+            store,
             message: '',
             Caches: [],
             imageurls: [],
@@ -113,8 +115,9 @@ export default {
         },
 
         selectanime(animeurl) {
-            this.$bus.emit('dataSent', animeurl);
-            console.log("successfully sent!")
+            store.AddNewAnime(animeurl)
+            // this.$bus.emit('dataSent', animeurl);
+            // console.log("successfully sent!")
             this.$emit('closesearchbox');
         },
 

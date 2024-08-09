@@ -1,6 +1,6 @@
 <!-- src/components/ImageListZone.vue -->
 <template>
-    <draggable v-model="images" :key="images" :options="{ animation: 200 }" class="image-list" group="anime" @change="on_drag_end">
+    <draggable v-model="store.ranklist[index].urls" :key="store.ranklist[index].urls" :options="{ animation: 200 }" class="image-list" group="anime" @change="on_drag_end">
         <template #item="{ element }">
             <div class="image-item">
                 <img :src="element.src" alt="">
@@ -12,25 +12,18 @@
 
 <script>
 import draggable from 'vuedraggable';
+import { store } from '@/utils/store.js'
 
 export default {
     components: {
         draggable,
     },
-    props: ['newimages', 'index'],//TODO
+    props: ['index'],//TODO
     data() {
         return {
-            images: [
-                // { src: '/1.jpg' },
-                // { src: '/2.jpg' },
-            ],
+            store,
         };
     },  
-    watch: {
-        newimages(newvalue, oldvalue) {
-            this.images = newvalue;
-        }
-    },
     methods: {
         emit_change_event(data) {
             this.$emit("change-event", data);

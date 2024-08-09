@@ -22,18 +22,15 @@
 
 		<SearchAnimeBox v-if="ifsearch" @closesearchbox="handleclosesearchbox" />
 
-		<div ref="imageRankTable" id="imageRankTable" class="imageranktable">
-			<template v-for="rankitem in ranklist" :key="rankitem">
-				<ImageRankTable :rankname="rankitem.name" :index="rankitem.index" :color="rankitem.color"
-					:imgurl="rankitem.urls" />
+		<div ref="imageRankTable" class="imageranktable">
+			<template v-for="rankitem in store.ranklist" :key="rankitem.index">
+				<ImageRankTable :index="rankitem.index" v-if="rankitem.index > 0" />
 			</template>
 		</div>
 
 		<div>
-			<SortableImageList :images="sortable_images_urls" ref="sortableImageList" id="sortableImageList" @opensearchbox="handleopensearchbox" />
+			<SortableImageList ref="sortableImageList" @opensearchbox="handleopensearchbox" />
 		</div>
-
-
 		<div ref="combinedContainer" class="combined-container" style="display: none"></div>
 	</div>
 	<AppFooter />
@@ -45,7 +42,8 @@ import ImageRankTable from '@/components/ImageRankTable.vue';
 import SearchAnimeBox from '@/components/SearchAnimeBox.vue';
 import AppFooter from './components/Footer.vue';
 import html2canvas from 'html2canvas';
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
+import { store } from '@/utils/store.js'
 
 export default {
 	components: {
@@ -56,15 +54,7 @@ export default {
 	},
 	data() {
 		return {
-			empty_ranklist: [],
-			ranklist: [
-				{ name: "老婆！！", index: 0, color: "OrangeRed ", urls: [] },
-				{ name: "老婆！", index: 1, color: "Orange", urls: [] },
-				{ name: "老婆？", index: 2, color: "GoldenRod", urls: [] },
-				{ name: "朋友吧", index: 3, color: "Gold", urls: [] },
-				{ name: "一般", index: 4, color: "Gray", urls: [] },
-			],
-			sortable_images_urls: [],
+			store,
 			ifsearch: false,
 			ifsave: false,
 			ifimport: false,
@@ -75,12 +65,10 @@ export default {
 		}
 	},
 	mounted() {
-		this.empty_ranklist = JSON.parse(JSON.stringify(this.ranklist)); // 记录初始值
+		// this.empty_ranklist = JSON.parse(JSON.stringify(this.ranklist)); // 记录初始值
 		this.load_data_from_cookie();                                    // 初始化时：试图从 cookie 加载上次的历史信息
-		this.$bus.on("dataSent", this.add_new_image_into_sorted);
 	},
 	beforeUnmount() {
-		this.$bus.off("dataSent");
 	},
 	methods: {
 		change_event_handler() {
@@ -92,7 +80,7 @@ export default {
 			});
 		},
 		clear_ranklist() { // 清空整个 ranklist
-			this.ranklist = JSON.parse(JSON.stringify(this.empty_ranklist));
+			store.ClearRankList();
 		},
 		set_cookie(name, value) {
 			Cookies.set(name, value, { expires: 30 }); // 30 天后过期
@@ -123,8 +111,8 @@ export default {
 			}
 		},
 		save_data_into_cookie(flag = true) {
-			this.set_cookie("save", this.get_json_presentation());
-			this.set_cookie("sort", this.get_sortable_data());
+			this.set_cookie("rank", JSON.stringify(store.ranklist, null, 2));
+			this.set_cookie("sortable", JSON.stringify(store.sortablelist, null, 2));
 			console.log("saving data into cookie.");
 			if (flag) {
 				alert("已保存！");
@@ -164,40 +152,8 @@ export default {
 			});
 			this.changesave();
 		},
-		get_json_presentation() {
-			const element = document.getElementById("imageRankTable");
-			const rows = element.querySelectorAll(".image-rank-row")
-			const data = Array.from(rows).map(item => {
-				return {
-					rowname: item.querySelector(".label").innerHTML,
-					rowurl: Array.from(item.querySelectorAll("img")).map(imgitem => {
-						return { src: imgitem.src };
-					})
-				}
-			})
-			const json = JSON.stringify(data, null, 2); // this is a string
-			return json;
-		},
-		get_sortable_data() { // 获得排序缓冲区的数据
-			const element = document.getElementById("sortableImageList");
-			const items = element.querySelectorAll(".image-item");
-			const data = Array.from(items).map(imgitem => {
-				const content = imgitem.innerHTML;
-				const regex = /src\s*=\s*('|")[^\s]*('|")/ig;
-				const match = regex.exec(content)[0];
-				const regex2 = /('|")[^\s]*('|")/ig
-				const match2 = regex2.exec(match)[0];
-				const real_src = match2.substring(1, match2.length - 1);
-				return { src: real_src };
-			});
-			const json = JSON.stringify(data, null, 2); // this is a string
-			return json;
-		},
 		savejson() {
-			const json = JSON.stringify({
-				save: JSON.parse(this.get_json_presentation()),
-				sort: JSON.parse(this.get_sortable_data())
-			}, null, 2);
+			const json = store.DumpJson();
 			const blob = new Blob([json], { type: 'application/json' });
 			const url = URL.createObjectURL(blob);
 			const a = document.createElement('a');
@@ -208,27 +164,13 @@ export default {
 			this.changesave();
 		},
 		loadjson(json_object) {
-			const importjson = JSON.parse(JSON.stringify(json_object));
-			if(importjson.length) {
-				for (var i = 0; i < importjson.length; i++) {
-					this.ranklist[i].name = importjson[i].rowname;
-					this.ranklist[i].urls = importjson[i].rowurl;
-				}
-			}
+			store.LoadRankList(json_object);
 		},
 		clearcontent() {
-			for (var i = 0; i < this.ranklist.length; i++) {
-				this.ranklist[i].urls = [];
-			}
+			store.ClearRankList();
 		},
 		loadsortjson(json_object) {
-			this.sortable_images_urls = [];
-			for (var i = 0; i < json_object.length; i += 1) {
-				const url = json_object[i].src;
-				this.sortable_images_urls.push({
-					src: url
-				})
-			}
+			store.LoadSortableList(json_object);
 		},
 		importnew() {
 
@@ -242,8 +184,8 @@ export default {
 					reader.onload = (e) => {
 						try {
 							const json_file = JSON.parse(e.target.result);
-							this.loadjson(json_file.save); // Parse JSON data
-							this.loadsortjson(json_file.sort);
+							this.loadjson(json_file.rank); // Parse JSON data
+							this.loadsortjson(json_file.sortable);
 							this.changeimport();
 						} catch (error) {
 							console.error('Error parsing JSON:', error);

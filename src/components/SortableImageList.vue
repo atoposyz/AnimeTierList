@@ -1,7 +1,7 @@
 <!-- src/components/SortableImageList.vue -->
 <template>
   <div class="sortable-image-list">
-    <ImageListZone ref="imageListZone" :newimages="images" @change-evnt="emit_change_event"/>
+    <ImageListZone ref="imageListZone" index="0" @change-evnt="emit_change_event"/>
     <div class="add-image" @click="addImage">
       <span>+</span>
     </div>
@@ -10,14 +10,15 @@
 
 <script>
 import ImageListZone from './ImageListZone.vue';
+import { store } from '@/utils/store.js'
 
 export default {
   components: {
     ImageListZone,
   },
-  props: ["images"],
   data() {
     return {
+      store,
     };
   },
   methods: {
