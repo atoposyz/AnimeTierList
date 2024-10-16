@@ -5,11 +5,11 @@ import { compileScript } from 'vue/compiler-sfc';
 export const store = reactive({
     ranklist: [
         { index: 0, urls: [] },
-        { index: 1, name: "老婆！！", color: "OrangeRed ", urls: [] },
-        { index: 2, name: "老婆！", color: "Orange", urls: [] },
-        { index: 3, name: "老婆？", color: "GoldenRod", urls: [] },
-        { index: 4, name: "朋友吧", color: "Gold", urls: [] },
-        { index: 5, name: "一般", color: "Gray", urls: [] },
+        { index: 1, name: "年度最爱", color: "OrangeRed ", urls: [] },
+        { index: 2, name: "很喜欢", color: "Orange", urls: [] },
+        { index: 3, name: "喜欢", color: "GoldenRod", urls: [] },
+        { index: 4, name: "一般喜欢", color: "Gold", urls: [] },
+        { index: 5, name: "不怎么喜欢", color: "Gray", urls: [] },
     ],
     sortablelist: [
 

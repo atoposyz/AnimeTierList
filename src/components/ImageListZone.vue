@@ -12,7 +12,7 @@
 
 <script>
 import draggable from 'vuedraggable';
-import { store } from '@/utils/store.js'
+import { store } from '@/utils/store.js';
 
 export default {
     components: {
