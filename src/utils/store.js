@@ -38,7 +38,7 @@ export const store = reactive({
         console.log(jsonobj)
         const importjson = JSON.parse(JSON.stringify(jsonobj));
         if (importjson.length) {
-            this.ResetRankList(importjson.length);
+            this.ResetRankList(importjson.length - 1);
             for (var i = 0; i < importjson.length; i++) {
                 this.ranklist[i].name = importjson[i].name;
                 this.ranklist[i].color = importjson[i].color;
@@ -123,6 +123,9 @@ export const store = reactive({
     },
     deleteRow(row) {
         this.ranklist.splice(row, 1);
+        for (let i = row; i < this.ranklist.length; i++) {
+            this.ranklist[i].index = i;
+        }
         this.loglist();
     },
     clearRow(row) {
