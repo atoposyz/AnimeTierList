@@ -23,7 +23,7 @@
              动画信息来自 <a href="https://bgm.tv/" target="_blank">番组计划</a></span>
         </div>
         <div class = "center">
-            <a href="atoposyz.github.io"> 返回主站</a>
+            <a href="https://atoposyz.github.io"> 返回主站</a>
         </div>
     </footer>
 </template>

@@ -4,48 +4,52 @@
         <div class="content-box">
             <!-- 第一行：10个颜色球 -->
             <div class="color-picker">
-                <div class="color-ball" style="background-color: #FF5733;" onclick="changeColor(index, '#FF5733')">
+                <div class="color-ball" style="background-color: #FF5733;" @click="changeColor(index, '#FF5733')">
                 </div>
-                <div class="color-ball" style="background-color: #FF6F00;" onclick="changeColor(index, '#FF6F00')">
+                <div class="color-ball" style="background-color: #FF6F00;" @click="changeColor(index, '#FF6F00')">
                 </div>
-                <div class="color-ball" style="background-color: #FF8C00;" onclick="changeColor(index, '#FF8C00')">
+                <div class="color-ball" style="background-color: #FF8C00;" @click="changeColor(index, '#FF8C00')">
                 </div>
-                <div class="color-ball" style="background-color: #FFB74D;" onclick="changeColor(index, '#FFB74D')">
+                <div class="color-ball" style="background-color: #FFB74D;" @click="changeColor(index, '#FFB74D')">
                 </div>
-                <div class="color-ball" style="background-color: #FFEB3B;" onclick="changeColor(index, '#FFEB3B')">
+                <div class="color-ball" style="background-color: #FFEB3B;" @click="changeColor(index, '#FFEB3B')">
                 </div>
-                <div class="color-ball" style="background-color: #4CAF50;" onclick="changeColor(index, '#4CAF50')">
+                <div class="color-ball" style="background-color: #4CAF50;" @click="changeColor(index, '#4CAF50')">
                 </div>
-                <div class="color-ball" style="background-color: #2196F3;" onclick="changeColor(index, '#2196F3')">
+                <div class="color-ball" style="background-color: #2196F3;" @click="changeColor(index, '#2196F3')">
                 </div>
-                <div class="color-ball" style="background-color: #9C27B0;" onclick="changeColor(index, '#9C27B0')">
+                <div class="color-ball" style="background-color: #9C27B0;" @click="changeColor(index, '#9C27B0')">
                 </div>
-                <div class="color-ball" style="background-color: #3F51B5;" onclick="changeColor(index, '#3F51B5')">
+                <div class="color-ball" style="background-color: #3F51B5;" @click="changeColor(index, '#3F51B5')">
                 </div>
-                <div class="color-ball" style="background-color: #673AB7;" onclick="changeColor(index, '#673AB7')">
+                <div class="color-ball" style="background-color: #673AB7;" @click="changeColor(index, '#673AB7')">
                 </div>
-                <div class="color-ball" style="background-color: #000000;" onclick="changeColor(index, '#000000')">
+                <div class="color-ball" style="background-color: #000000;" @click="changeColor(index, '#000000')">
                 </div>
-                <div class="color-ball" style="background-color: #B0BEC5;" onclick="changeColor(index, '#B0BEC5')">
+                <div class="color-ball" style="background-color: #B0BEC5;" @click="changeColor(index, '#B0BEC5')">
                 </div>
-                <div class="color-ball" style="background-color: #FFFFFF;" onclick="changeColor(index, '#FFFFFF')">
+                <div class="color-ball" style="background-color: #FFFFFF;" @click="changeColor(index, '#FFFFFF')">
                 </div>
             </div>
 
-            <!-- 第二行：文本框 -->
             <div class="text-box">
-                <input type="text" id="text-input" :value="store.ranklist[index].name" oninput="updateText()">
+                <input type="text" v-model="inputText" id="text-input" @input="updateText()">
             </div>
 
-            <!-- 第三行和第四行：四个按钮 -->
+            
             <div class="button-row">
-                <button onclick="resetSettings()">删除本行</button>
-                <button onclick="saveSettings()">清空本行</button>
+                <button @click="moveUp()">上移一行</button>
+                <button @click="moveDown()">下移一行</button>
             </div>
             <div class="button-row">
-                <button onclick="applySettings()">上边加一行</button>
-                <button onclick="cancelSettings()">下边加一行</button>
+                <button @click="addAbove()">上边加一行</button>
+                <button @click="addBelow()">下边加一行</button>
             </div>
+            <div class="button-row">
+                <button @click="deleteRow()">删除本行</button>
+                <button @click="clearRow()">清空本行</button>
+            </div>
+
             <div class="foot">
                 <a class="close ui-btn current" @click="closeSearchBox">关闭设置</a>
             </div>
@@ -63,7 +67,7 @@ export default {
         return {
             store,
             selectedColor: '#FF5733', // 默认颜色
-            inputText: '',  // 默认文本
+            inputText: store.ranklist[this.index].name,  // 默认文本
         }
     },
     props: ['index'],
@@ -77,43 +81,46 @@ export default {
 
 
         // 改变颜色
-        changeColor(color) {
-            selectedColor = color;
-            document.body.style.backgroundColor = selectedColor; // 改变页面背景颜色
+        changeColor(index, color) {
+            store.ranklist[index].color = color;
             console.log(`当前选中颜色: ${color}`);
         },
 
         // 更新输入框文本
         updateText() {
-            inputText = document.getElementById('text-input').value;
-            console.log(`当前输入文字: ${inputText}`);
+            store.ranklist[this.index].name = this.inputText;
+            console.log(`当前输入文字: ${this.inputText}`);
         },
 
-        // 重置设置
-        resetSettings() {
-            selectedColor = '#FF5733';  // 重置颜色
-            inputText = '';             // 清空文本框
-            document.body.style.backgroundColor = selectedColor;  // 重置背景颜色
-            document.getElementById('text-input').value = '';     // 清空输入框
-            console.log('设置已重置');
+        moveUp() {
+            if(this.index > 1) {
+                store.moveUp(this.index);
+            }
+            this.closeSearchBox();
         },
-
-        // 保存设置
-        saveSettings() {
-            console.log(`已保存设置：颜色 - ${selectedColor}, 文字 - ${inputText}`);
+        moveDown() {
+            if(this.index < store.ranklist.length - 1) {
+                store.moveDown(this.index);
+            }
+            this.closeSearchBox();
         },
-
-        // 应用设置
-        applySettings() {
-            alert(`设置已应用：颜色 - ${selectedColor}, 文字 - ${inputText}`);
+        addAbove() {
+            console.log("trying addAbove");
+            store.addAbove(this.index);
+            this.closeSearchBox();
         },
-
-        // 取消设置
-        cancelSettings() {
-            resetSettings();  // 取消即重置设置
-            console.log('设置已取消');
+        addBelow() {
+            store.addBelow(this.index);
+            this.closeSearchBox();
         },
-
+        deleteRow() {
+            store.deleteRow(this.index);
+            this.closeSearchBox();
+        },
+        clearRow() {
+            store.clearRow(this.index);
+            this.closeSearchBox();
+        },
     }
 }
 

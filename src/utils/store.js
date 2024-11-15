@@ -14,6 +14,12 @@ export const store = reactive({
     sortablelist: [
 
     ],
+    ResetRankList(num) {
+        this.ranklist = [{ index: 0, urls: [] }];
+        for (let i = 1; i <= num; i++) {
+            this.ranklist.push({index: i, name: "", color: "LightYellow", urls: []});
+        }
+    },
     ClearRankList() {
         for (let i = 1; i < this.ranklist.length; i++) {
             for (let j = 0; j < this.ranklist[i].urls.length; j++) {
@@ -32,9 +38,10 @@ export const store = reactive({
         console.log(jsonobj)
         const importjson = JSON.parse(JSON.stringify(jsonobj));
         if (importjson.length) {
+            this.ResetRankList(importjson.length);
             for (var i = 0; i < importjson.length; i++) {
                 this.ranklist[i].name = importjson[i].name;
-                // this.ranklist[i].color = importjson[i].color;
+                this.ranklist[i].color = importjson[i].color;
                 this.ranklist[i].urls = importjson[i].urls;
             }
         }
@@ -81,4 +88,46 @@ export const store = reactive({
 
         return JSON.stringify({ rank: JSON.parse(this.getRankListJson()), sortable: JSON.parse(this.getSortableListJson()) }, null, 2)
     },
+    loglist() {
+        console.log(this.ranklist);
+    },
+    moveUp(row) {
+        if(row > 1) {
+            [this.ranklist[row - 1], this.ranklist[row]] = [this.ranklist[row], this.ranklist[row - 1]];
+            this.ranklist[row - 1].index = row - 1;
+            this.ranklist[row].index = row;
+        }
+        this.loglist();
+    },
+    moveDown(row) {
+        if(row < this.ranklist.length - 1) {
+            [this.ranklist[row], this.ranklist[row + 1]] = [this.ranklist[row + 1], this.ranklist[row]];
+            this.ranklist[row + 1].index = row + 1;
+            this.ranklist[row].index = row;
+        }
+        this.loglist();
+    },
+    addAbove(row) {
+        this.ranklist.splice(row, 0, { index: 0, name: "NEW", color: "#66CCFF", urls: [] });
+        for (let i = row; i < this.ranklist.length; i++) {
+            this.ranklist[i].index = i;
+        }
+        this.loglist();
+    },
+    addBelow(row) {
+        this.ranklist.splice(row + 1, 0, { index: 0, name: "NEW", color: "#66CCFF", urls: [] });
+        for (let i = row + 1; i < this.ranklist.length; i++) {
+            this.ranklist[i].index = i;
+        }
+        this.loglist();
+    },
+    deleteRow(row) {
+        this.ranklist.splice(row, 1);
+        this.loglist();
+    },
+    clearRow(row) {
+        this.ranklist[row].urls = [];
+        this.loglist();
+    },
+    
 })
