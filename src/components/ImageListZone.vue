@@ -3,7 +3,7 @@
     <draggable v-model="store.ranklist[index].urls" :key="store.ranklist[index].urls" :options="{ animation: 200 }" class="image-list" group="anime" @change="on_drag_end">
         <template #item="{ element }">
             <div class="image-item">
-                <img :src="element.src" alt="">
+                <img :src="element.src" alt="" crossorigin="anonymous">
             </div>
         </template>
     </draggable>
