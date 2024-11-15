@@ -14,8 +14,6 @@
                 </template>
             </div>
             <div class="foot">
-                <a class="close ui-btn" action="setInputText">没找到，就用搜索框里的文字了</a>
-                <a class="close ui-btn" action="setNull">重设为空</a>
                 <a class="close ui-btn current" @click="closeSearchBox">关闭选框</a>
             </div>
         </div>

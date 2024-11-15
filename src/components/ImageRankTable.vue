@@ -5,7 +5,7 @@
       <span class="label">{{ store.ranklist[index].name }}</span>
     </div>
     <ImageListZone class="image-list" :index="index" :key="index" @change-event="emit_change_event"/>
-    <div class="settings" @click="settings">
+    <div class="settings" @click="opensettingbox(index)">
       <span>settings</span>
     </div>
   </div>
@@ -29,7 +29,9 @@ export default {
     emit_change_event(data) {
       this.$emit("change-event", data);
     },
-    settings() {
+    opensettingbox(index) {
+      console.log("try to opensettingbox No." + index);
+      this.$emit("opensettingbox", index);
     //   const newImageSrc = prompt('请输入新图片的URL:')
     //   if (newImageSrc) {
     //     this.images.push({ src: newImageSrc })

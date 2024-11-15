@@ -20,11 +20,12 @@
 			</div>
 		</div>
 
+		<RowSettingBox v-if="ifsetting" :index="this.settingindex" @closesettingbox="handleclosesettingbox" />
 		<SearchAnimeBox v-if="ifsearch" @closesearchbox="handleclosesearchbox" />
 
 		<div ref="imageRankTable" class="imageranktable">
-			<template v-for="rankitem in store.ranklist" :key="rankitem.index">
-				<ImageRankTable :index="rankitem.index" v-if="rankitem.index > 0" />
+			<template v-for="rankitem in store.ranklist" :key="rankitem.index" >
+				<ImageRankTable :index="rankitem.index" v-if="rankitem.index > 0" @opensettingbox="handleopensettingbox"/>
 			</template>
 		</div>
 
@@ -39,6 +40,7 @@
 <script>
 import SortableImageList from '@/components/SortableImageList.vue';
 import ImageRankTable from '@/components/ImageRankTable.vue';
+import RowSettingBox from './components/RowSettingBox.vue';
 import SearchAnimeBox from '@/components/SearchAnimeBox.vue';
 import AppFooter from './components/Footer.vue';
 import html2canvas from 'html2canvas';
@@ -51,10 +53,12 @@ export default {
 		SortableImageList,
 		SearchAnimeBox,
 		AppFooter,
+		RowSettingBox,
 	},
 	data() {
 		return {
 			store,
+			ifsetting: false,
 			ifsearch: false,
 			ifsave: false,
 			ifimport: false,
@@ -62,6 +66,7 @@ export default {
 			cache_title: '网页缓存',
 			importtitle: "导入",
 			cleartitle: '清空',
+			settingindex: 1,
 		}
 	},
 	mounted() {
@@ -87,6 +92,14 @@ export default {
 		},
 		get_cookie(name) {
 			return Cookies.get(name); // 获取指定名称的 cookie
+		},
+		handleopensettingbox(index) {
+			this.settingindex = index;
+			console.log("receive trying opensettingbox No." + this.settingindex);
+			this.ifsetting = true;
+		},
+		handleclosesettingbox() {
+			this.ifsetting = false;
 		},
 		handleopensearchbox() {
 			this.ifsearch = true;
