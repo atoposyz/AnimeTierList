@@ -43,9 +43,11 @@ import ImageRankTable from '@/components/ImageRankTable.vue';
 import RowSettingBox from './components/RowSettingBox.vue';
 import SearchAnimeBox from '@/components/SearchAnimeBox.vue';
 import AppFooter from './components/Footer.vue';
-import html2canvas from 'html2canvas';
 import Cookies from 'js-cookie';
 import { store } from '@/utils/store.js'
+import html2canvas from 'html2canvas';
+import * as htmlToImage from 'html-to-image';
+import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 
 export default {
 	components: {
@@ -160,6 +162,19 @@ export default {
 			// 克隆整个元素，保留原始网页不受影响
 			const settingsDivs = element.querySelectorAll('div.settings'); // 查找所有 class 为 settings 的 div
 			settingsDivs.forEach(div => div.style.display = "none"); // 删除每一个找到的 div
+			// htmlToImage.toCanvas(element).then(function (canvas) {
+			// 	const link = document.createElement('a');
+			// 	link.href = canvas.toDataURL('image/png');
+			// 	link.download = 'ImageRankTable.png';
+			// 	link.click();
+			// });
+			// htmlToImage.toPng(element).then(function (dataUrl) {
+			// 		//download(dataUrl, 'my-node.png');
+			// 		const link = document.createElement('a');
+			// 		link.href = dataUrl;
+			// 		link.download = 'ImageRankTable.png';
+			// 		link.click();
+			// 	});
 			html2canvas(element, { useCORS: true }).then(canvas => {
 				const link = document.createElement('a');
 				link.href = canvas.toDataURL('image/png');
