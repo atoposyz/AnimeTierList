@@ -51,6 +51,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 12px;
     transition: box-shadow 0.3s ease, transform 0.2s ease;
 }
 
