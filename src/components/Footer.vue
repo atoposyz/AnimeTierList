@@ -1,6 +1,8 @@
 <template>
     <footer class = "footer">
-        <!-- 自定义页脚内容 -->
+        <div class = "center morelink">
+            <a href="https://atoposyz.github.io"> 返回主站</a>
+        </div>
         <div class="beian center" m="y-2">
             <a href="https://icp.gov.moe/?keyword=20240313" target="_blank" rel="noopener"
                 style="display: flex; padding-right: 5px;">
@@ -8,7 +10,7 @@
                 萌ICP备20240313号
             </a>
             |
-            <a style="text-decoration:none;color:#55bb8a; display: flex; padding-left: 5px;"
+            <a style="text-decoration:none; display: flex; padding-left: 5px;"
                 href="https://travel.moe/go.html" title="异次元之旅-跃迁-我们一起去萌站成员的星球旅行吧！" target="_blank">
                 <img src="https://travel.moe/images/icon/icon64green.png" style="width:24px;height:24px">
                 异次元之旅
@@ -22,9 +24,7 @@
             <span><a href="https://github.com/atoposyz/AnimeTierList" target="_blank">GitHub</a>
              动画信息来自 <a href="https://bgm.tv/" target="_blank">番组计划</a></span>
         </div>
-        <div class = "center">
-            <a href="https://atoposyz.github.io"> 返回主站</a>
-        </div>
+        
     </footer>
 </template>
 
@@ -36,11 +36,15 @@ export default {
 
 <style scoped>
 .footer {
-    background-color: #333;
-    color: #fff;
     padding: 20px;
     text-align: center;
-    margin-top: 50px;
+    margin-top: 10px;
+}
+
+.morelink{
+    font: 30px sans-serif;
+    margin-bottom: 30px;
+    color: #666;
 }
 
 .center {

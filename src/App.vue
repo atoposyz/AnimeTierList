@@ -230,6 +230,11 @@ export default {
 	margin-left: auto;
 	margin-right: auto;
 	margin-top: 50px;
+	padding: 20px;
+	background-color: #ffffff;    
+	border-radius: 10px;       
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);  
+	border: 1px solid #e0e0e0;  
 }
 
 .opt {
@@ -240,6 +245,7 @@ export default {
 
 .imageranktable {
 	margin-top: 50px;
+	padding: 30px;
 }
 
 button {
@@ -254,6 +260,7 @@ button {
 	text-decoration: none;
 	text-indent: 0;
 	line-height: 20px;
+	font: 20px sans-serif;
 }
 
 .file input {

@@ -50,6 +50,15 @@ export default {
   gap: 2px;
   margin-bottom: 2px;
   min-width: 400px;
+
+  background-color: #f9fafb;    /* 轻柔背景色 */
+  padding: 12px;
+  border-radius: 8px;            /* 圆角 */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.image-rank-row:nth-child(even) {
+  background-color: #eef1f5;
 }
 
 .rank-name {
@@ -59,6 +68,15 @@ export default {
   justify-content: center;
   align-items: center;
   min-height: 100px;
+
+  border-radius: 12px;                 /* 圆角，避免尖角 */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* 柔和阴影 */
+  transition: box-shadow 0.3s ease, transform 0.2s ease; /* 动态效果 */
+}
+
+.rank-name:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* 悬浮时阴影增强 */
+  transform: translateY(-3px);                /* 轻微上移效果 */
 }
 
 .label {
