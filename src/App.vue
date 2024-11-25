@@ -160,28 +160,24 @@ export default {
 		captureimg() {
 			const element = this.$refs.imageRankTable;
 			// 克隆整个元素，保留原始网页不受影响
-			const settingsDivs = element.querySelectorAll('div.settings'); // 查找所有 class 为 settings 的 div
+			var settingsDivs = element.querySelectorAll('div.settings'); // 查找所有 class 为 settings 的 div
 			settingsDivs.forEach(div => div.style.display = "none"); // 删除每一个找到的 div
-			// htmlToImage.toCanvas(element).then(function (canvas) {
-			// 	const link = document.createElement('a');
-			// 	link.href = canvas.toDataURL('image/png');
-			// 	link.download = 'ImageRankTable.png';
-			// 	link.click();
-			// });
-			// htmlToImage.toPng(element).then(function (dataUrl) {
-			// 		//download(dataUrl, 'my-node.png');
-			// 		const link = document.createElement('a');
-			// 		link.href = dataUrl;
-			// 		link.download = 'ImageRankTable.png';
-			// 		link.click();
-			// 	});
+			settingsDivs = element.querySelectorAll("image-rank-row");
+			settingsDivs.forEach(div => div.style.boxShadow = "");
+			settingsDivs = element.querySelectorAll("rank-name");
+			settingsDivs.forEach(div => div.style.boxShadow = "");
 			html2canvas(element, { useCORS: true }).then(canvas => {
 				const link = document.createElement('a');
 				link.href = canvas.toDataURL('image/png');
 				link.download = 'ImageRankTable.png';
 				link.click();
 			});
-			settingsDivs.forEach(div => div.style.display = "flex");
+			settingsDivs = element.querySelectorAll('div.settings'); 
+			settingsDivs.forEach(div => div.style.display = "flex"); 
+			settingsDivs = element.querySelectorAll("image-rank-row");
+			settingsDivs.forEach(div => div.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.05)");
+			settingsDivs = element.querySelectorAll("rank-name");
+			settingsDivs.forEach(div => div.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.1)");
 			this.changesave();
 		},
 		savejson() {
