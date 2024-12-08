@@ -41,35 +41,35 @@ export default {
         this.Caches = [
             {
                 "id": 464376,
-                "title": "败犬女主太多了！"
+                "name_cn": "败犬女主太多了！"
             },
             {
                 "id": 389156,
-                "title": "地。-关于地球的运动-"
+                "name_cn": "地。-关于地球的运动-"
             },
             {
                 "id": 431767,
-                "title": "GIRLS BAND CRY"
+                "name_cn": "GIRLS BAND CRY"
             },
             {
                 "id": 395378,
-                "title": "迷宫饭"
+                "name_cn": "迷宫饭"
             },
             {
                 "id": 372010,
-                "title": "狼与香辛料 行商邂逅贤狼"
+                "name_cn": "狼与香辛料 行商邂逅贤狼"
             },
             {
                 "id": 404809,
-                "title": "末日列车去哪里？"
+                "name_cn": "末日列车去哪里？"
             },
             {
                 "id": 429644,
-                "title": "名侦探柯南：百万美元的五棱星"
+                "name_cn": "名侦探柯南：百万美元的五棱星"
             },
             {
                 "id": 448478,
-                "title": "失忆投捕"
+                "name_cn": "失忆投捕"
             }
         ]
         this.resetAnimeList(this.Caches)
