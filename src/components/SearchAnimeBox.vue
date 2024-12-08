@@ -22,7 +22,8 @@
 
 <script>
 import { store } from '@/utils/store.js'
-const APIURL = `https://lab.magiconch.com/api/bangumi/`;
+// const APIURL = `https://lab.magiconch.com/api/bangumi/`;
+const APIURL = `https://api.bgm.tv/search/subject/`
 const CORSurl = `https://proxyz-tau.vercel.app/api/proxy-image?url=`;
 const ImageURL = `https://api.bgm.tv/v0/subjects/`;
 
@@ -88,11 +89,11 @@ export default {
         },
 
         async searchFromBangumiByKeyword(keyword) {
-            let url = `${APIURL}anime/onlines`;
-            if (keyword) url = url + `?keyword=${encodeURIComponent(keyword)}`;
+            let url = `${APIURL}`;
+            if (keyword) url = url + `${encodeURIComponent(keyword)}?type=2&responseGroup=small&max_results=8`;
 
             const animes = await this.get(url);
-            this.resetAnimeList(animes);
+            this.resetAnimeList(animes.list);
         },
 
         searchFromBangumi() {
@@ -107,7 +108,7 @@ export default {
                 return {
                     id: anime.id,
                     url: url,
-                    title: anime.title
+                    title: anime.name_cn
                 };
             })
         },
