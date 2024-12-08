@@ -2,7 +2,8 @@
 	<div class="home" @mouseup="change_event_handler">
 		<div class="opt">
 			<div class="in-output">
-				<button @click="clearcontent">{{ cleartitle }}</button>
+				<button @click="writer" v-show="!ifimport && !ifsave">{{ writertitle }}</button>
+				<button @click="clearcontent" v-show="!ifimport && !ifsave">{{ cleartitle }}</button>
 				<button @click="changesave" v-show="!ifimport">{{ savetitle }}</button>
 				<button @click="changeimport" v-show="!ifsave">{{ importtitle }}</button>
 			</div>
@@ -24,9 +25,20 @@
 		<SearchAnimeBox v-if="ifsearch" @closesearchbox="handleclosesearchbox" />
 
 		<div ref="imageRankTable" class="imageranktable">
-			<template v-for="rankitem in store.ranklist" :key="rankitem.index" >
-				<ImageRankTable :index="rankitem.index" v-if="rankitem.index > 0" @opensettingbox="handleopensettingbox"/>
+			<div class="tabletitle center">
+				年度动画分组
+			</div>
+			<div class="writer" v-show="iwriter">
+				<span>填表人：</span>
+				<input type="text" placeholder="写上你的名字" size="10rem" oninput="this.style.width = (this.value.length>18?this.value.length:10) + 'rem';">
+			</div>
+			<template v-for="rankitem in store.ranklist" :key="rankitem.index">
+				<ImageRankTable :index="rankitem.index" v-if="rankitem.index > 0"
+					@opensettingbox="handleopensettingbox" />
 			</template>
+			<!-- <div class="tablefooter">
+				atoposyz.github.io/anime-rank/index.html 动画信息来自Bangumi
+			</div> -->
 		</div>
 
 		<div>
@@ -60,10 +72,12 @@ export default {
 	data() {
 		return {
 			store,
+			iwriter: false,
 			ifsetting: false,
 			ifsearch: false,
 			ifsave: false,
 			ifimport: false,
+			writertitle: "填表人OFF",
 			savetitle: '保存',
 			cache_title: '网页缓存',
 			importtitle: "导入",
@@ -108,6 +122,17 @@ export default {
 		},
 		handleclosesearchbox() {
 			this.ifsearch = false;
+		},
+		writer() {
+			this.iwriter = !this.iwriter;
+			if(this.iwriter) {
+				this.writertitle = "填表人ON";
+			} else {
+				this.writertitle = "填表人OFF";
+			}
+		},
+		clearcontent() {
+			store.ClearRankList();
 		},
 		changesave() {
 			this.ifsave = !this.ifsave;
@@ -172,8 +197,8 @@ export default {
 				link.download = 'ImageRankTable.png';
 				link.click();
 			});
-			settingsDivs = element.querySelectorAll('div.settings'); 
-			settingsDivs.forEach(div => div.style.display = "flex"); 
+			settingsDivs = element.querySelectorAll('div.settings');
+			settingsDivs.forEach(div => div.style.display = "flex");
 			// settingsDivs = element.querySelectorAll("image-rank-row");
 			// settingsDivs.forEach(div => div.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.05)");
 			// settingsDivs = element.querySelectorAll("rank-name");
@@ -194,9 +219,7 @@ export default {
 		loadjson(json_object) {
 			store.LoadRankList(json_object);
 		},
-		clearcontent() {
-			store.ClearRankList();
-		},
+		
 		loadsortjson(json_object) {
 			store.LoadSortableList(json_object);
 		},
@@ -242,10 +265,10 @@ export default {
 	margin-right: auto;
 	margin-top: 50px;
 	padding: 20px;
-	background-color: #ffffff;    
-	border-radius: 10px;       
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);  
-	border: 1px solid #e0e0e0;  
+	background-color: #ffffff;
+	border-radius: 10px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	border: 1px solid #e0e0e0;
 }
 
 .opt {
@@ -254,9 +277,42 @@ export default {
 	margin-right: 5px;
 }
 
+.writer{
+	margin-right: 5px;
+	margin-bottom: 15px;
+	margin-left: auto;
+	display: flex;
+	justify-content: flex-end;
+	font: 15px sans-serif;
+}
+
+.writer input {
+	width: auto;
+    min-width: 5px; /* 设置最小宽度 */
+	border: none; 
+	background: none; 
+	padding: 0;
+	outline: none;
+	font: 15px sans-serif;
+}
+
 .imageranktable {
 	margin-top: 50px;
 	padding: 30px;
+}
+
+.tabletitle {
+	font: 30px sans-serif;
+	margin-bottom: 15px;
+	
+}
+.tablefooter{
+	font: 12px sans-serif;
+	color: #777777;
+}
+.center {
+	display: flex;
+	justify-content: center;
 }
 
 button {

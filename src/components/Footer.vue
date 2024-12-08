@@ -22,7 +22,7 @@
         </div>
         <div class="footer-copyright center">
             <span><a href="https://github.com/atoposyz/AnimeTierList" target="_blank">GitHub</a>
-             动画信息来自 <a href="https://bgm.tv/" target="_blank">番组计划</a></span>
+             动画信息来自 <a href="https://bgm.tv/" target="_blank">Bangumi</a></span>
         </div>
         
     </footer>
