@@ -56,8 +56,8 @@ export default {
 }
 
 .image-item:hover {
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);   /* 鼠标悬停时增强阴影 */
-  transform: translateY(-3px);                 /* 轻微上移效果 */
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);   
+  transform: translateY(-3px);
 }
 
 .image-item img {
