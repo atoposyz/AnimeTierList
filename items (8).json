@@ -1,0 +1,106 @@
+{
+  "rank": [
+    {
+      "index": 0,
+      "urls": [
+        {
+          "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/474906/image?type=common"
+        },
+        {
+          "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/443428/image?type=common"
+        },
+        {
+          "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/429644/image?type=common"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "name": "究极无敌好看",
+      "color": "OrangeRed ",
+      "urls": [
+        {
+          "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/464376/image?type=common"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "name": "十分好看",
+      "color": "Orange",
+      "urls": [
+        {
+          "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/395378/image?type=common"
+        },
+        {
+          "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/441795/image?type=common"
+        },
+        {
+          "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/411428/image?type=common"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "name": "好看",
+      "color": "GoldenRod",
+      "urls": [
+        {
+          "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/431767/image?type=common"
+        },
+        {
+          "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/372010/image?type=common"
+        },
+        {
+          "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/444557/image?type=common"
+        },
+        {
+          "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/283643/image?type=common"
+        },
+        {
+          "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/404809/image?type=common"
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "name": "还行",
+      "color": "Gold",
+      "urls": [
+        {
+          "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/471926/image?type=common"
+        },
+        {
+          "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/342667/image?type=common"
+        },
+        {
+          "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/424663/image?type=common"
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "name": "一般",
+      "color": "Gray",
+      "urls": [
+        {
+          "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/426239/image?type=common"
+        },
+        {
+          "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/405785/image?type=common"
+        },
+        {
+          "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/425909/image?type=common"
+        }
+      ]
+    }
+  ],
+  "sortable": [
+    {
+      "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/474906/image?type=common"
+    },
+    {
+      "src": "https://proxyz-tau.vercel.app/api/proxy-image?url=https://api.bgm.tv/v0/subjects/443428/image?type=common"
+    }
+  ]
+}
