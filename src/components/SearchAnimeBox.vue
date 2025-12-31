@@ -116,7 +116,10 @@ export default {
 
         resetAnimeList(animes) {
             this.imageurls = animes.map(anime => {
-                var url = CORSurl + ImageURL + anime.id + '/image?type=common'
+                // var url = CORSurl + ImageURL + anime.id + '/image?type=common'
+                const raw = `${ImageURL}${anime.id}/image?type=common`;
+                const url = `${CORSurl}${encodeURIComponent(raw)}`;
+
                 return {
                     id: anime.id,
                     url: url,

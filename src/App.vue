@@ -86,8 +86,7 @@ import AppFooter from './components/Footer.vue';
 import Cookies from 'js-cookie';
 import { store } from '@/utils/store.js'
 import html2canvas from 'html2canvas';
-import * as htmlToImage from 'html-to-image';
-import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
+import { toPng } from 'html-to-image';
 
 export default {
 	components: {
@@ -219,29 +218,128 @@ export default {
 			this.load_main_data_from_cookie();
 			this.load_sort_data_from_cookie();
 		},
-		captureimg() {
+		// captureimg() {
+		// 	const element = this.$refs.imageRankTable;
+		// 	// 克隆整个元素，保留原始网页不受影响
+		// 	var settingsDivs = element.querySelectorAll('div.settings'); // 查找所有 class 为 settings 的 div
+		// 	settingsDivs.forEach(div => div.style.display = "none"); // 删除每一个找到的 div
+		// 	// settingsDivs = element.querySelectorAll("image-rank-row");
+		// 	// settingsDivs.forEach(div => div.style.boxShadow = "");
+		// 	// settingsDivs = element.querySelectorAll("rank-name");
+		// 	// settingsDivs.forEach(div => div.style.boxShadow = "");
+		// 	html2canvas(element, { useCORS: true }).then(canvas => {
+		// 		const link = document.createElement('a');
+		// 		link.href = canvas.toDataURL('image/png');
+		// 		link.download = 'ImageRankTable.png';
+		// 		link.click();
+		// 	});
+		// 	settingsDivs = element.querySelectorAll('div.settings');
+		// 	settingsDivs.forEach(div => div.style.display = "flex");
+		// 	// settingsDivs = element.querySelectorAll("image-rank-row");
+		// 	// settingsDivs.forEach(div => div.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.05)");
+		// 	// settingsDivs = element.querySelectorAll("rank-name");
+		// 	// settingsDivs.forEach(div => div.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.1)");
+		// 	this.changesave();
+		// },
+		async captureimg() {
 			const element = this.$refs.imageRankTable;
-			// 克隆整个元素，保留原始网页不受影响
-			var settingsDivs = element.querySelectorAll('div.settings'); // 查找所有 class 为 settings 的 div
-			settingsDivs.forEach(div => div.style.display = "none"); // 删除每一个找到的 div
-			// settingsDivs = element.querySelectorAll("image-rank-row");
-			// settingsDivs.forEach(div => div.style.boxShadow = "");
-			// settingsDivs = element.querySelectorAll("rank-name");
-			// settingsDivs.forEach(div => div.style.boxShadow = "");
-			html2canvas(element, { useCORS: true }).then(canvas => {
-				const link = document.createElement('a');
-				link.href = canvas.toDataURL('image/png');
-				link.download = 'ImageRankTable.png';
-				link.click();
+			if (!element) return;
+
+			// 0. 等待字体加载
+			if (document.fonts && document.fonts.ready) {
+				await document.fonts.ready;
+			}
+
+			// 1. 创建深度克隆 (不影响原界面)
+			const clone = element.cloneNode(true);
+
+			// 2. 将克隆节点移出可视区域
+			const container = document.createElement('div');
+			Object.assign(container.style, {
+				position: 'fixed',
+				top: '-10000px',
+				left: '-10000px',
+				width: element.offsetWidth + 'px',
+				height: element.offsetHeight + 'px',
+				zIndex: '-1',
+				background: '#ffffff', // 确保背景白底
 			});
-			settingsDivs = element.querySelectorAll('div.settings');
-			settingsDivs.forEach(div => div.style.display = "flex");
-			// settingsDivs = element.querySelectorAll("image-rank-row");
-			// settingsDivs.forEach(div => div.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.05)");
-			// settingsDivs = element.querySelectorAll("rank-name");
-			// settingsDivs.forEach(div => div.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.1)");
-			this.changesave();
+			container.appendChild(clone);
+			document.body.appendChild(container);
+
+			try {
+				// 3. 隐藏不需要的按钮
+				clone.querySelectorAll('div.settings').forEach(div => div.style.display = 'none');
+				clone.querySelectorAll('.writer input').forEach(input => {
+					// 修复输入框文字在截图时不显示的问题
+					input.setAttribute('value', input.value); 
+				});
+
+				// 4. 【核心修复】手动下载图片并转为 Base64
+				// 这步操作彻底绕过了 html-to-image 的内部缓存和加载器
+				const images = clone.querySelectorAll('img');
+				const tasks = Array.from(images).map(async (img) => {
+					const src = img.src;
+					if (!src || src.startsWith('data:')) return;
+
+					try {
+						// 必须清除 srcset，否则浏览器可能忽略 src 的修改
+						img.removeAttribute('srcset');
+						img.setAttribute('loading', 'eager'); // 强制立即加载
+
+						// 手动 Fetch 图片，加时间戳强制请求最新资源
+						// 注意：图片服务器必须支持 CORS (Access-Control-Allow-Origin)
+						const response = await fetch(src + (src.includes('?') ? '&' : '?') + 't=' + Date.now(), {
+							cache: 'no-cache',
+							mode: 'cors' 
+						});
+
+						const blob = await response.blob();
+						
+						// 将 Blob 转为 Base64
+						const base64Url = await new Promise((resolve, reject) => {
+							const reader = new FileReader();
+							reader.onloadend = () => resolve(reader.result);
+							reader.onerror = reject;
+							reader.readAsDataURL(blob);
+						});
+
+						// 将克隆节点里的 img 替换为 base64
+						img.src = base64Url;
+
+					} catch (err) {
+						console.warn('图片转Base64失败，将使用原链接重试:', src, err);
+						// 失败了不做处理，保留原 src，尽人事听天命
+					}
+				});
+
+				// 等待所有图片转换完成
+				await Promise.all(tasks);
+
+				// 5. 生成截图
+				const dataUrl = await toPng(clone, {
+					backgroundColor: '#ffffff',
+					pixelRatio: window.devicePixelRatio,
+					skipAutoScale: true, // 防止部分情况下缩放导致模糊
+					cacheBust: true,     // 双重保险
+				});
+
+				// 6. 下载
+				const link = document.createElement('a');
+				link.href = dataUrl;
+				link.download = `年度动画分组_${Date.now()}.png`;
+				link.click();
+
+			} catch (e) {
+				console.error('导出图片失败:', e);
+				alert('导出失败：请检查网络或图片是否存在跨域限制。');
+			} finally {
+				// 7. 清理 DOM
+				document.body.removeChild(container);
+				this.changesave();
+			}
 		},
+
 		savejson() {
 			const json = store.DumpJson();
 			const blob = new Blob([json], { type: 'application/json' });
@@ -609,4 +707,8 @@ button:hover {
 	transform: translateY(-2px);
 	box-shadow: 0 8px 20px rgba(79, 156, 224, 0.2);
 }
+.imageranktable{
+  background: #fff;
+}
+
 </style>
