@@ -450,9 +450,6 @@ button:hover {
 	opacity: 0;
 }
 
-.file:hover {
-	/* lighter accent on hover handled by button:hover */
-}
 
 /* 代码分享模态框样式 */
 .code-share-modal {
