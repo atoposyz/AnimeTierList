@@ -186,16 +186,47 @@ export default {
 				this.importtitle = "导入";
 			}
 		},
+		// save_data_into_cookie(flag = true) {
+		// 	this.set_cookie("rank", JSON.stringify(store.ranklist, null, 2));
+		// 	this.set_cookie("sortable", JSON.stringify(store.sortablelist, null, 2));
+		// 	console.log("saving data into cookie.");
+		// 	if (flag) {
+		// 		alert("已保存！");
+		// 	}
+		// },
 		save_data_into_cookie(flag = true) {
-			this.set_cookie("rank", JSON.stringify(store.ranklist, null, 2));
-			this.set_cookie("sortable", JSON.stringify(store.sortablelist, null, 2));
-			console.log("saving data into cookie.");
+			this.set_local("rank", JSON.stringify(store.ranklist));
+			this.set_local("sortable", JSON.stringify(store.sortablelist));
+
+			// ⭐ 立刻从 localStorage 恢复，符合用户直觉
+			this.load_data_from_cookie();
+
+			console.log("saving data into localStorage.");
 			if (flag) {
 				alert("已保存！");
 			}
 		},
+
+		set_local(key, value) {
+			try {
+				localStorage.setItem(key, value);
+			} catch (e) {
+				console.error('localStorage 写入失败:', e);
+				alert('本地存储失败，可能是空间不足或浏览器限制');
+			}
+		},
+
+		get_local(key) {
+			try {
+				return localStorage.getItem(key);
+			} catch (e) {
+				console.error('localStorage 读取失败:', e);
+				return null;
+			}
+		},
+
 		load_main_data_from_cookie() {
-			const json_string = this.get_cookie("rank");
+			const json_string = this.get_local("rank");
 			if (json_string == null || json_string == "") {  // 当前没有可用 json
 				this.save_data_into_cookie(false);           // 存一个进去
 				return;
@@ -205,7 +236,7 @@ export default {
 			console.log("load main data from cookie.");
 		},
 		load_sort_data_from_cookie() {
-			const json_string = this.get_cookie("sortable");
+			const json_string = this.get_local("sortable");
 			if (json_string == null || json_string == "") {  // 当前没有可用 json
 				this.save_data_into_cookie(false);           // 存一个进去
 				return;
@@ -217,6 +248,11 @@ export default {
 		load_data_from_cookie() {
 			this.load_main_data_from_cookie();
 			this.load_sort_data_from_cookie();
+		},
+		clear_local_cache() {
+			localStorage.removeItem("rank");
+			localStorage.removeItem("sortable");
+			alert("本地缓存已清空");
 		},
 		// captureimg() {
 		// 	const element = this.$refs.imageRankTable;
