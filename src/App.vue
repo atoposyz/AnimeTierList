@@ -87,6 +87,7 @@ import Cookies from 'js-cookie';
 import { store } from '@/utils/store.js'
 import html2canvas from 'html2canvas';
 import { toPng } from 'html-to-image';
+import LZString from "lz-string";
 
 export default {
 	components: {
@@ -424,41 +425,49 @@ export default {
 				}
 			}
 		},
-		// 编码数据为分享代码
+		// 编码数据为分享代码（更短）
 		encodeDataToCode() {
 			try {
 				const data = {
-					rank: store.ranklist,
-					sortable: store.sortablelist,
+				rank: store.ranklist,
+				sortable: store.sortablelist,
 				};
 				const jsonStr = JSON.stringify(data);
-				// 使用 Base64 编码
-				const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
-				this.shareCode = encoded;
+
+				// 输出为 URL-safe 的压缩字符串（推荐）
+				const code = LZString.compressToEncodedURIComponent(jsonStr);
+
+				this.shareCode = code;
 				this.ifcodeshare = true;
 			} catch (error) {
-				console.error('编码失败:', error);
-				alert('编码失败，请重试');
+				console.error("编码失败:", error);
+				alert("编码失败，请重试");
 			}
 		},
+
 		// 从分享代码导入数据
 		decodeCodeToData() {
 			try {
-				if (!this.importCodeInput.trim()) {
-					alert('请粘贴有效的代码');
-					return;
+				const input = this.importCodeInput.trim();
+				if (!input) {
+				alert("请粘贴有效的代码");
+				return;
 				}
-				const decoded = decodeURIComponent(escape(atob(this.importCodeInput.trim())));
-				const data = JSON.parse(decoded);
+
+				const jsonStr = LZString.decompressFromEncodedURIComponent(input);
+				if (!jsonStr) throw new Error("decompress failed");
+
+				const data = JSON.parse(jsonStr);
 				this.loadjson(data.rank);
 				this.loadsortjson(data.sortable);
-				alert('导入成功！');
-				this.importCodeInput = '';
+
+				alert("导入成功！");
+				this.importCodeInput = "";
 				this.ifcodeimport = false;
 				this.changeimport();
 			} catch (error) {
-				console.error('解码失败:', error);
-				alert('代码无效或已损坏，请检查后重试');
+				console.error("解码失败:", error);
+				alert("代码无效或已损坏，请检查后重试");
 			}
 		},
 		// 复制分享代码到剪贴板
@@ -654,7 +663,7 @@ button:hover {
 }
 
 .share-code-textarea {
-	width: 100%;
+	width: 80%;
 	height: 120px;
 	padding: 12px;
 	border: 1px solid rgba(16, 24, 40, 0.1);
@@ -716,7 +725,7 @@ button:hover {
 }
 
 .import-code-textarea {
-	width: 100%;
+	width: 80%;
 	height: 120px;
 	padding: 12px;
 	border: 1px solid rgba(16, 24, 40, 0.1);
