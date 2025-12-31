@@ -1,7 +1,7 @@
 <!-- src/components/SortableImageList.vue -->
 <template>
   <div class="sortable-image-list">
-    <ImageListZone ref="imageListZone" index="0" @change-evnt="emit_change_event"/>
+    <ImageListZone ref="imageListZone" :index="0" @change-event="emit_change_event"/>
     <div class="add-image" @click="addImage">
       <span>+</span>
     </div>

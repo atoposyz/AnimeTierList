@@ -1,8 +1,8 @@
 <!-- src/components/SortableImageList.vue -->
 <template>
   <div class="image-rank-row">
-    <div class="rank-name" :style="{ 'background-color': store.ranklist[index].color }" contenteditable="true">
-      <span class="label">{{ store.ranklist[index].name }}</span>
+    <div class="rank-name" :style="{ 'background-color': store.ranklist[index].color }" contenteditable="true" @input="onNameInput($event)">
+      {{ store.ranklist[index].name }}
     </div>
     <ImageListZone class="image-list" :index="index" :key="index" @change-event="emit_change_event"/>
     <div class="settings" @click="opensettingbox(index)">
@@ -38,6 +38,13 @@ export default {
     //   }
     //   // 此处信息发生了改变，应该考虑更新 cookie
     //   this.emit_change_event("");
+    }
+    ,
+    onNameInput(e) {
+      const text = (e.target && e.target.innerText) ? e.target.innerText.trim() : '';
+      if (typeof this.index === 'number' && this.store && this.store.ranklist && this.store.ranklist[this.index]) {
+        this.store.ranklist[this.index].name = text;
+      }
     }
   }
 }

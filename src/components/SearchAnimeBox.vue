@@ -35,6 +35,7 @@ export default {
             message: '',
             Caches: [],
             imageurls: [],
+            loading: false,
         }
     },
     mounted() {
@@ -80,9 +81,16 @@ export default {
             document.documentElement.setAttribute('data-no-touch', true);
             try {
                 const response = await fetch(url);
+                if (!response.ok) {
+                    console.error('fetch error', response.status, response.statusText);
+                    return null;
+                }
                 const data = await response.json();
                 this.Caches[url] = data;
                 return data;
+            } catch (err) {
+                console.error('network error:', err);
+                return null;
             } finally {
                 document.documentElement.setAttribute('data-no-touch', false);
             }
@@ -91,14 +99,18 @@ export default {
         async searchFromBangumiByKeyword(keyword) {
             let url = `${APIURL}`;
             if (keyword) url = url + `${encodeURIComponent(keyword)}?type=2&responseGroup=small&max_results=8`;
-
+            this.loading = true;
             const animes = await this.get(url);
+            this.loading = false;
+            if (!animes || !animes.list) {
+                this.resetAnimeList([]);
+                return;
+            }
             this.resetAnimeList(animes.list);
         },
 
         searchFromBangumi() {
             const keyword = this.message;
-
             this.searchFromBangumiByKeyword(keyword);
         },
 

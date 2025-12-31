@@ -1,9 +1,9 @@
 <!-- src/components/ImageListZone.vue -->
 <template>
-    <draggable v-model="store.ranklist[index].urls" :key="store.ranklist[index].urls" :options="{ animation: 200 }" class="image-list" group="anime" @change="on_drag_end">
+    <draggable v-model="store.ranklist[index].urls" :key="index" :options="{ animation: 200 }" class="image-list" group="anime" @change="on_drag_end">
         <template #item="{ element }">
             <div class="image-item">
-                <img :src="element.src" alt="" crossorigin="anonymous">
+                <img :src="element.src" alt="anime image" crossorigin="anonymous" loading="lazy">
             </div>
         </template>
     </draggable>

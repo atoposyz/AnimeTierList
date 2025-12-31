@@ -1,34 +1,34 @@
-<!-- src/components/SearchAnimeBox.vue -->
+<!-- src/components/RowSettingBox.vue -->
 <template>
     <div class="search-anime-box ui-shadow">
         <div class="content-box">
-            <!-- 第一行：10个颜色球 -->
+            <!-- 第一行：颜色球 -->
             <div class="color-picker">
-                <div class="color-ball" style="background-color: #FF5733;" @click="changeColor(index, '#FF5733')">
+                <div class="color-ball" style="background-color: #FF5733;" @click="changeColor('#FF5733')">
                 </div>
-                <div class="color-ball" style="background-color: #FF6F00;" @click="changeColor(index, '#FF6F00')">
+                <div class="color-ball" style="background-color: #FF6F00;" @click="changeColor('#FF6F00')">
                 </div>
-                <div class="color-ball" style="background-color: #FF8C00;" @click="changeColor(index, '#FF8C00')">
+                <div class="color-ball" style="background-color: #FF8C00;" @click="changeColor('#FF8C00')">
                 </div>
-                <div class="color-ball" style="background-color: #FFB74D;" @click="changeColor(index, '#FFB74D')">
+                <div class="color-ball" style="background-color: #FFB74D;" @click="changeColor('#FFB74D')">
                 </div>
-                <div class="color-ball" style="background-color: #FFEB3B;" @click="changeColor(index, '#FFEB3B')">
+                <div class="color-ball" style="background-color: #FFEB3B;" @click="changeColor('#FFEB3B')">
                 </div>
-                <div class="color-ball" style="background-color: #4CAF50;" @click="changeColor(index, '#4CAF50')">
+                <div class="color-ball" style="background-color: #4CAF50;" @click="changeColor('#4CAF50')">
                 </div>
-                <div class="color-ball" style="background-color: #2196F3;" @click="changeColor(index, '#2196F3')">
+                <div class="color-ball" style="background-color: #2196F3;" @click="changeColor('#2196F3')">
                 </div>
-                <div class="color-ball" style="background-color: #9C27B0;" @click="changeColor(index, '#9C27B0')">
+                <div class="color-ball" style="background-color: #9C27B0;" @click="changeColor('#9C27B0')">
                 </div>
-                <div class="color-ball" style="background-color: #3F51B5;" @click="changeColor(index, '#3F51B5')">
+                <div class="color-ball" style="background-color: #3F51B5;" @click="changeColor('#3F51B5')">
                 </div>
-                <div class="color-ball" style="background-color: #673AB7;" @click="changeColor(index, '#673AB7')">
+                <div class="color-ball" style="background-color: #673AB7;" @click="changeColor('#673AB7')">
                 </div>
-                <div class="color-ball" style="background-color: #000000;" @click="changeColor(index, '#000000')">
+                <div class="color-ball" style="background-color: #000000;" @click="changeColor('#000000')">
                 </div>
-                <div class="color-ball" style="background-color: #B0BEC5;" @click="changeColor(index, '#B0BEC5')">
+                <div class="color-ball" style="background-color: #B0BEC5;" @click="changeColor('#B0BEC5')">
                 </div>
-                <div class="color-ball" style="background-color: #FFFFFF;" @click="changeColor(index, '#FFFFFF')">
+                <div class="color-ball" style="background-color: #FFFFFF;" @click="changeColor('#FFFFFF')">
                 </div>
             </div>
 
@@ -36,7 +36,6 @@
                 <input type="text" v-model="inputText" id="text-input" @input="updateText()">
             </div>
 
-            
             <div class="button-row">
                 <button @click="moveUp()">上移一行</button>
                 <button @click="moveDown()">下移一行</button>
@@ -51,10 +50,9 @@
             </div>
 
             <div class="foot">
-                <a class="close ui-btn current" @click="closeSearchBox">取消</a>
+                <a class="close ui-btn current" @click="closeSearchBox">关闭</a>
             </div>
         </div>
-
 
     </div>
 </template>
@@ -63,55 +61,83 @@
 import { store } from '@/utils/store.js'
 
 export default {
+    props: ['index'],
     data() {
         return {
             store,
             selectedColor: '#FF5733', // 默认颜色
-            inputText: store.ranklist[this.index].name,  // 默认文本
+            inputText: '',  // 延迟在 mounted 中初始化，避免在 data() 使用 this.index
         }
     },
-    props: ['index'],
     mounted() {
-
+        const idx = this.index;
+        if (typeof idx === 'number' && store.ranklist && store.ranklist[idx]) {
+            this.inputText = store.ranklist[idx].name || '';
+            this.selectedColor = store.ranklist[idx].color || this.selectedColor;
+        }
+    },
+    watch: {
+        index(newIdx) {
+            if (typeof newIdx === 'number' && store.ranklist && store.ranklist[newIdx]) {
+                this.inputText = store.ranklist[newIdx].name || '';
+                this.selectedColor = store.ranklist[newIdx].color || this.selectedColor;
+            } else {
+                this.inputText = '';
+            }
+        }
     },
     methods: {
         closeSearchBox() {
             this.$emit('closesettingbox');
         },
 
-
-        // 改变颜色
-        changeColor(index, color) {
-            store.ranklist[index].color = color;
-            console.log(`当前选中颜色: ${color}`);
+        // 改变颜色（只传 color，内部使用 this.index）
+        changeColor(color) {
+            const idx = this.index;
+            if (typeof idx === 'number' && store.ranklist && store.ranklist[idx]) {
+                store.ranklist[idx].color = color;
+                this.selectedColor = color;
+                console.log(`当前选中颜色: ${color}`);
+            }
         },
 
         // 更新输入框文本
         updateText() {
-            store.ranklist[this.index].name = this.inputText;
-            console.log(`当前输入文字: ${this.inputText}`);
+            const idx = this.index;
+            if (typeof idx === 'number' && store.ranklist && store.ranklist[idx]) {
+                store.ranklist[idx].name = this.inputText;
+                console.log(`当前输入文字: ${this.inputText}`);
+            }
         },
 
         moveUp() {
-            if(this.index > 1) {
+            this.updateText();
+            if (this.index > 1) {
                 store.moveUp(this.index);
             }
             this.closeSearchBox();
         },
         moveDown() {
-            if(this.index < store.ranklist.length - 1) {
+            this.updateText();
+            if (this.index < store.ranklist.length - 1) {
                 store.moveDown(this.index);
             }
             this.closeSearchBox();
         },
         addAbove() {
             console.log("trying addAbove");
+            // persist current edits
+            this.updateText();
             store.addAbove(this.index);
-            this.closeSearchBox();
+            // reopen settings for the newly inserted row (the new row sits at this.index)
+            this.$emit('reopensetting', this.index);
         },
         addBelow() {
+            // persist current edits
+            this.updateText();
             store.addBelow(this.index);
-            this.closeSearchBox();
+            // reopen settings for the newly inserted row (it sits at this.index + 1)
+            this.$emit('reopensetting', this.index + 1);
         },
         deleteRow() {
             store.deleteRow(this.index);
@@ -123,7 +149,6 @@ export default {
         },
     }
 }
-
 
 
 </script>

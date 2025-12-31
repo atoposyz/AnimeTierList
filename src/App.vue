@@ -21,7 +21,7 @@
 			</div>
 		</div>
 
-		<RowSettingBox v-if="ifsetting" :index="this.settingindex" @closesettingbox="handleclosesettingbox" />
+		<RowSettingBox v-if="ifsetting" :index="this.settingindex" @closesettingbox="handleclosesettingbox" @reopensetting="handlereopensetting" />
 		<SearchAnimeBox v-if="ifsearch" @closesearchbox="handleclosesearchbox" />
 
 		<div ref="imageRankTable" class="imageranktable">
@@ -95,6 +95,11 @@ export default {
 		change_event_handler() {
 
 		},
+		handlereopensetting(index) {
+			// reopen settings for given index
+			this.settingindex = index;
+			this.ifsetting = true;
+		},
 		add_new_image_into_sorted(new_anime_image_url) {
 			this.sortable_images_urls.push({
 				src: new_anime_image_url
@@ -159,7 +164,7 @@ export default {
 			}
 		},
 		load_main_data_from_cookie() {
-			const json_string = this.get_cookie("save");
+			const json_string = this.get_cookie("rank");
 			if (json_string == null || json_string == "") {  // 当前没有可用 json
 				this.save_data_into_cookie(false);           // 存一个进去
 				return;
@@ -169,7 +174,7 @@ export default {
 			console.log("load main data from cookie.");
 		},
 		load_sort_data_from_cookie() {
-			const json_string = this.get_cookie("sort");
+			const json_string = this.get_cookie("sortable");
 			if (json_string == null || json_string == "") {  // 当前没有可用 json
 				this.save_data_into_cookie(false);           // 存一个进去
 				return;
