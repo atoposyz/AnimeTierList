@@ -1,34 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 @import './base.css';
 
+/* Layout container */
 #app {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
-  font-weight: normal;
+  font-weight: 400;
+  padding: 24px;
 }
 
+/* Links */
 a {
   text-decoration: none;
-  color: #666;
-  transition: 0.4s;
+  color: var(--muted);
+  transition: color 0.25s ease, transform 0.15s ease;
   padding: 3px;
 }
 
 @media (hover: hover) {
   a:hover {
-    
+    color: var(--primary-600);
+    transform: translateY(-1px);
   }
 }
 
-@media (min-width: 1024px) {
+/* Page background for larger screens */
+@media (min-width: 768px) {
   body {
     display: flex;
     place-items: center;
-    background: #DDD;
+    background: linear-gradient(180deg, #f5f8fb 0%, #eef6ff 100%);
+    -webkit-font-smoothing: antialiased;
   }
 
   #app {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
+    grid-template-columns: 1fr;
+    padding: 2rem;
   }
 }

@@ -36,6 +36,15 @@
   --section-gap: 160px;
 }
 
+/* Project visual tokens */
+:root {
+  --primary: #4f9ce0; /* 主色调 */
+  --primary-600: #2b85d6;
+  --radius: 12px;
+  --card-bg: var(--vt-c-white);
+  --muted: #6b7280;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --color-background: var(--vt-c-black);

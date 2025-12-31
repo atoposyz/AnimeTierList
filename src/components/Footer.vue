@@ -42,9 +42,9 @@ export default {
 }
 
 .morelink{
-    font: 30px sans-serif;
-    margin-bottom: 30px;
-    color: #666;
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: var(--muted);
 }
 
 .center {
@@ -66,5 +66,7 @@ export default {
 .footer-copyright {
     margin-top: 0;
     font-size: 0.9em;
+    color: var(--muted);
 }
+.footer a:hover { color: var(--primary-600); }
 </style>

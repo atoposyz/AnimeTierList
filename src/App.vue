@@ -11,13 +11,44 @@
 				<button @click="save_data_into_cookie">{{ cache_title }}</button>
 				<button @click="savejson">json</button>
 				<button @click="captureimg">image</button>
+				<button @click="openCodeShare">代码</button>
 			</div>
 			<div class="importopt" v-show="ifimport">
-				<button>代码</button>
+				<button @click="openCodeImport">代码</button>
 				<button class="file"><input type="file" @change="handleFileUpload" accept=".json" />json</button>
 			</div>
 			<div class="zhanweifu" v-show="!ifsave & !ifimport">
-				<button style="border: 0; background-color: rgba(0, 0, 0, 0)"></button>
+				<button style="border: 0; padding: 0; background-color: rgba(0, 0, 0, 0)"></button>
+			</div>
+		</div>
+
+		<!-- 代码分享模态框 -->
+		<div class="code-share-modal" v-show="ifcodeshare">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h2>分享代码</h2>
+					<button class="close-btn" @click="closeCodeShare">✕</button>
+				</div>
+				<div class="modal-body">
+					<p class="modal-hint">复制下面的代码分享给朋友，他们粘贴到"代码导入"就能恢复你的数据</p>
+					<textarea class="share-code-textarea" readonly :value="shareCode"></textarea>
+					<button class="copy-btn" @click="copyShareCode">复制代码</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- 代码导入弹窗 -->
+		<div class="code-import-modal" v-show="ifcodeimport">
+			<div class="modal-content-import">
+				<div class="modal-header">
+					<h3>导入代码</h3>
+					<button class="close-btn" @click="closeCodeImport">✕</button>
+				</div>
+				<div class="modal-body-import">
+					<p>粘贴别人分享的代码：</p>
+					<textarea v-model="importCodeInput" class="import-code-textarea" placeholder="粘贴分享代码"></textarea>
+					<button class="import-btn" @click="decodeCodeToData">导入数据</button>
+				</div>
 			</div>
 		</div>
 
@@ -36,9 +67,6 @@
 				<ImageRankTable :index="rankitem.index" v-if="rankitem.index > 0"
 					@opensettingbox="handleopensettingbox" />
 			</template>
-			<!-- <div class="tablefooter">
-				atoposyz.github.io/anime-rank/index.html 动画信息来自Bangumi
-			</div> -->
 		</div>
 
 		<div>
@@ -77,12 +105,16 @@ export default {
 			ifsearch: false,
 			ifsave: false,
 			ifimport: false,
+			ifcodeshare: false,
+			ifcodeimport: false,
 			writertitle: "填表人OFF",
 			savetitle: '保存',
 			cache_title: '网页缓存',
 			importtitle: "导入",
 			cleartitle: '清空',
 			settingindex: 1,
+			shareCode: '',
+			importCodeInput: '',
 		}
 	},
 	mounted() {
@@ -258,6 +290,72 @@ export default {
 				}
 			}
 		},
+		// 编码数据为分享代码
+		encodeDataToCode() {
+			try {
+				const data = {
+					rank: store.ranklist,
+					sortable: store.sortablelist,
+				};
+				const jsonStr = JSON.stringify(data);
+				// 使用 Base64 编码
+				const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+				this.shareCode = encoded;
+				this.ifcodeshare = true;
+			} catch (error) {
+				console.error('编码失败:', error);
+				alert('编码失败，请重试');
+			}
+		},
+		// 从分享代码导入数据
+		decodeCodeToData() {
+			try {
+				if (!this.importCodeInput.trim()) {
+					alert('请粘贴有效的代码');
+					return;
+				}
+				const decoded = decodeURIComponent(escape(atob(this.importCodeInput.trim())));
+				const data = JSON.parse(decoded);
+				this.loadjson(data.rank);
+				this.loadsortjson(data.sortable);
+				alert('导入成功！');
+				this.importCodeInput = '';
+				this.ifcodeimport = false;
+				this.changeimport();
+			} catch (error) {
+				console.error('解码失败:', error);
+				alert('代码无效或已损坏，请检查后重试');
+			}
+		},
+		// 复制分享代码到剪贴板
+		copyShareCode() {
+			this.ifcodeshare = false;
+			navigator.clipboard.writeText(this.shareCode).then(() => {
+				alert('代码已复制到剪贴板！');
+			}).catch(err => {
+				console.error('复制失败:', err);
+				alert('复制失败，请手动复制');
+			});
+		},
+		// 打开分享代码界面
+		openCodeShare() {
+			this.encodeDataToCode();
+		},
+		// 打开导入代码界面
+		openCodeImport() {
+			this.importCodeInput = '';
+			this.ifcodeimport = true;
+		},
+		// 关闭导入代码界面
+		closeCodeImport() {
+			this.ifcodeimport = false;
+			this.importCodeInput = '';
+		},
+		// 关闭分享代码界面
+		closeCodeShare() {
+			this.ifcodeshare = false;
+			this.shareCode = '';
+		},
 	}
 };
 </script>
@@ -268,16 +366,16 @@ export default {
 	max-width: 1000px;
 	margin-left: auto;
 	margin-right: auto;
-	margin-top: 50px;
-	padding: 20px;
-	background-color: #ffffff;
-	border-radius: 10px;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-	border: 1px solid #e0e0e0;
+	margin-top: 40px;
+	padding: 28px;
+	background-color: var(--card-bg);
+	border-radius: var(--radius);
+	box-shadow: 0 8px 30px rgba(15, 30, 50, 0.08);
+	border: 1px solid rgba(16,24,40,0.04);
 }
 
 .opt {
-	margin-bottom: 20px;
+	margin-bottom: 18px;
 	text-align: right;
 	margin-right: 5px;
 }
@@ -288,32 +386,34 @@ export default {
 	margin-left: auto;
 	display: flex;
 	justify-content: flex-end;
-	font: 15px sans-serif;
+	font-size: 15px;
+	color: var(--muted);
 }
 
 .writer input {
 	width: auto;
-    min-width: 5px; /* 设置最小宽度 */
-	border: none; 
-	background: none; 
-	padding: 0;
+	min-width: 5px;
+	border: none;
+	background: transparent;
+	padding: 6px 8px;
 	outline: none;
-	font: 15px sans-serif;
+	font-size: 15px;
 }
 
 .imageranktable {
-	margin-top: 50px;
-	padding: 30px;
+	margin-top: 30px;
+	padding: 8px 0;
 }
 
 .tabletitle {
-	font: 30px sans-serif;
-	margin-bottom: 15px;
-	
+	font-size: 28px;
+	font-weight: 600;
+	margin-bottom: 12px;
+	color: var(--primary-600);
 }
 .tablefooter{
-	font: 12px sans-serif;
-	color: #777777;
+	font-size: 12px;
+	color: var(--muted);
 }
 .center {
 	display: flex;
@@ -323,16 +423,23 @@ export default {
 button {
 	position: relative;
 	display: inline-block;
-	background: #d0eeff;
-	border: 1px solid #99d3f5;
-	border-radius: 4px;
-	padding: 4px 12px;
+	background: linear-gradient(180deg, var(--primary) 0%, var(--primary-600) 100%);
+	border: none;
+	color: white;
+	border-radius: 8px;
+	padding: 8px 14px;
 	overflow: hidden;
-	color: #1e88c7;
 	text-decoration: none;
-	text-indent: 0;
 	line-height: 20px;
-	font: 20px sans-serif;
+	font-size: 14px;
+	cursor: pointer;
+	box-shadow: 0 6px 18px rgba(47, 128, 237, 0.12);
+	transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+button:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 10px 24px rgba(47, 128, 237, 0.16);
 }
 
 .file input {
@@ -344,9 +451,165 @@ button {
 }
 
 .file:hover {
-	background: #aadffd;
-	border-color: #78c3f3;
-	color: #004974;
-	text-decoration: none;
+	/* lighter accent on hover handled by button:hover */
+}
+
+/* 代码分享模态框样式 */
+.code-share-modal {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 999;
+}
+
+.modal-content {
+	background: white;
+	border-radius: 12px;
+	padding: 24px;
+	max-width: 500px;
+	width: 90%;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 16px;
+}
+
+.modal-header h2 {
+	font-size: 20px;
+	margin: 0;
+	color: var(--primary-600);
+}
+
+.close-btn {
+	background: none;
+	border: none;
+	font-size: 24px;
+	cursor: pointer;
+	color: var(--muted);
+	padding: 0;
+	width: 32px;
+	height: 32px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 6px;
+	transition: background 0.2s ease;
+}
+
+.close-btn:hover {
+	background: rgba(0, 0, 0, 0.05);
+	transform: none;
+	box-shadow: none;
+}
+
+.modal-body {
+	text-align: center;
+}
+
+.modal-hint {
+	font-size: 14px;
+	color: var(--muted);
+	margin-bottom: 12px;
+}
+
+.share-code-textarea {
+	width: 100%;
+	height: 120px;
+	padding: 12px;
+	border: 1px solid rgba(16, 24, 40, 0.1);
+	border-radius: 8px;
+	font-family: monospace;
+	font-size: 12px;
+	resize: none;
+	margin-bottom: 12px;
+}
+
+.copy-btn {
+	width: 100%;
+	padding: 10px;
+	background: var(--primary);
+	color: white;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 14px;
+	transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.copy-btn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 20px rgba(79, 156, 224, 0.2);
+}
+
+/* 代码导入模态框样式 */
+.code-import-modal {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 998;
+}
+
+.modal-content-import {
+	background: white;
+	border-radius: 12px;
+	padding: 24px;
+	max-width: 500px;
+	width: 90%;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-body-import {
+	text-align: left;
+}
+
+.modal-body-import p {
+	margin-bottom: 12px;
+	font-size: 14px;
+	color: var(--muted);
+}
+
+.import-code-textarea {
+	width: 100%;
+	height: 120px;
+	padding: 12px;
+	border: 1px solid rgba(16, 24, 40, 0.1);
+	border-radius: 8px;
+	font-family: monospace;
+	font-size: 12px;
+	resize: none;
+	margin-bottom: 12px;
+}
+
+.import-btn {
+	width: 100%;
+	padding: 10px;
+	background: var(--primary);
+	color: white;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 14px;
+	transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.import-btn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 20px rgba(79, 156, 224, 0.2);
 }
 </style>

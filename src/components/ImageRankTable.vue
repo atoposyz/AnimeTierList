@@ -57,39 +57,50 @@ export default {
   gap: 8px;
   margin-bottom: 2px;
   min-width: 400px;
-
-  background-color: #f9fafb;    /* 轻柔背景色 */
-  padding: 12px;
-  border-radius: 8px;            /* 圆角 */
-  /* box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); */
+  background-color: var(--card-bg);    /* 卡片背景 */
+  padding: 14px;
+  border-radius: calc(var(--radius) - 4px);            /* 圆角 */
+  box-shadow: 0 6px 18px rgba(20,30,50,0.06);
 }
 
 .image-rank-row:nth-child(even) {
-  background-color: #eef1f5;
+  background-color: rgba(15, 30, 50, 0.02);
 }
 
 .rank-name {
   display: flex;
-  width: 100px;
-  background-color: white;
+  width: 120px;
+  background-color: var(--card-bg);
   justify-content: center;
   align-items: center;
   min-height: 100px;
-
-  border-radius: 12px;                 
-  /* box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);  */
-  transition: box-shadow 0.3s ease, transform 0.2s ease; 
+  border-radius: 10px;
+  position: relative; /* 使伪元素绝对定位不影响内容流 */
+  transition: box-shadow 0.25s ease, transform 0.18s ease;
 }
 
 .rank-name:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); 
-  transform: translateY(-3px);                
-} 
+  box-shadow: 0 8px 22px rgba(16, 24, 40, 0.08);
+  transform: translateY(-4px);
+}
+
+.rank-name::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6px; /* 距离底部一定高度，避免影响垂直居中 */
+  height: 6px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  pointer-events: none;
+}
 
 .label {
   text-align: center;
   margin: 0 auto;
   font-size: 15px;
+  font-weight: 600;
 }
 
 .image-rank-row .image-list {
@@ -103,6 +114,13 @@ export default {
   display: flex;
   width: 10%;
   justify-content: center;
-  align-items: center
+  align-items: center;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.image-rank-row .settings:hover {
+  color: var(--primary-600);
+  transform: translateY(-2px);
 }
 </style>
