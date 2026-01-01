@@ -163,7 +163,8 @@ export default {
     padding: 40px 10px;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
-    background: rgba(0, 0, 0, 0.8)
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
 }
 
 .ui-shadow .content-box {
