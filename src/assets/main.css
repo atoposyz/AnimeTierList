@@ -1,9 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 @import './base.css';
 
+/* Layout container */
 #app {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
-  font-weight: normal;
+  font-weight: 400;
+  padding: 24px;
 }
 
 /* layout helper container used by components */
@@ -14,10 +17,11 @@
   padding: 0 1rem;
 }
 
+/* Links */
 a {
   text-decoration: none;
-  color: #666;
-  transition: 0.4s;
+  color: var(--muted);
+  transition: color 0.25s ease, transform 0.15s ease;
   padding: 3px;
 }
 
@@ -48,11 +52,13 @@ input[type="text"]:focus, textarea:focus { box-shadow: 0 6px 18px rgba(16,24,40,
 
 @media (hover: hover) {
   a:hover {
-    
+    color: var(--primary-600);
+    transform: translateY(-1px);
   }
 }
 
-@media (min-width: 1024px) {
+/* Page background for larger screens */
+@media (min-width: 768px) {
   body {
     min-height: 100vh;
     display: flex;

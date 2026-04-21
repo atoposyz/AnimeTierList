@@ -1,6 +1,5 @@
 // store.js
 import { reactive } from 'vue'
-import { compileScript } from 'vue/compiler-sfc';
 
 export const store = reactive({
     ranklist: [
@@ -36,14 +35,17 @@ export const store = reactive({
     },
     LoadRankList(jsonobj) {
         console.log(jsonobj)
-        const importjson = JSON.parse(JSON.stringify(jsonobj));
-        if (importjson.length) {
-            this.ResetRankList(importjson.length - 1);
-            for (var i = 0; i < importjson.length; i++) {
-                this.ranklist[i].name = importjson[i].name;
-                this.ranklist[i].color = importjson[i].color;
-                this.ranklist[i].urls = importjson[i].urls;
-            }
+        const importjson = JSON.parse(JSON.stringify(jsonobj || []));
+        // Rebuild ranklist from imported data to avoid index/name mismatches.
+        if (Array.isArray(importjson) && importjson.length >= 1) {
+            this.ranklist = importjson.map((item, idx) => {
+                return {
+                    index: idx,
+                    name: item.name || '',
+                    color: item.color || (idx === 0 ? undefined : 'LightYellow'),
+                    urls: Array.isArray(item.urls) ? item.urls : []
+                };
+            });
         }
     },
     LoadSortableList(jsonobj) {
@@ -108,14 +110,14 @@ export const store = reactive({
         this.loglist();
     },
     addAbove(row) {
-        this.ranklist.splice(row, 0, { index: 0, name: "NEW", color: "#66CCFF", urls: [] });
+        this.ranklist.splice(row, 0, { index: 0, name: "", color: "#66CCFF", urls: [] });
         for (let i = row; i < this.ranklist.length; i++) {
             this.ranklist[i].index = i;
         }
         this.loglist();
     },
     addBelow(row) {
-        this.ranklist.splice(row + 1, 0, { index: 0, name: "NEW", color: "#66CCFF", urls: [] });
+        this.ranklist.splice(row + 1, 0, { index: 0, name: "", color: "#66CCFF", urls: [] });
         for (let i = row + 1; i < this.ranklist.length; i++) {
             this.ranklist[i].index = i;
         }

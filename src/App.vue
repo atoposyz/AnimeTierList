@@ -19,17 +19,48 @@
 				<button @click="save_data_into_cookie">{{ cache_title }}</button>
 				<button @click="savejson">json</button>
 				<button @click="captureimg">image</button>
+				<button @click="openCodeShare">代码</button>
 			</div>
 			<div class="importopt" v-show="ifimport">
-				<button>代码</button>
+				<button @click="openCodeImport">代码</button>
 				<button class="file"><input type="file" @change="handleFileUpload" accept=".json" />json</button>
 			</div>
 			<div class="zhanweifu" v-show="!ifsave & !ifimport">
-				<button style="border: 0; background-color: rgba(0, 0, 0, 0)"></button>
+				<button style="border: 0; padding: 0; background-color: rgba(0, 0, 0, 0)"></button>
 			</div>
 		</div>
 
-		<RowSettingBox v-if="ifsetting" :index="this.settingindex" @closesettingbox="handleclosesettingbox" />
+		<!-- 代码分享模态框 -->
+		<div class="code-share-modal" v-show="ifcodeshare">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h2>分享代码</h2>
+					<button class="close-btn" @click="closeCodeShare">✕</button>
+				</div>
+				<div class="modal-body">
+					<p class="modal-hint">复制下面的代码分享给朋友，他们粘贴到"代码导入"就能恢复你的数据</p>
+					<textarea class="share-code-textarea" readonly :value="shareCode"></textarea>
+					<button class="copy-btn" @click="copyShareCode">复制代码</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- 代码导入弹窗 -->
+		<div class="code-import-modal" v-show="ifcodeimport">
+			<div class="modal-content-import">
+				<div class="modal-header">
+					<h3>导入代码</h3>
+					<button class="close-btn" @click="closeCodeImport">✕</button>
+				</div>
+				<div class="modal-body-import">
+					<p>粘贴别人分享的代码：</p>
+					<textarea v-model="importCodeInput" class="import-code-textarea" placeholder="粘贴分享代码"></textarea>
+					<button class="import-btn" @click="decodeCodeToData">导入数据</button>
+				</div>
+			</div>
+		</div>
+
+		<RowSettingBox v-if="ifsetting" :index="this.settingindex" @closesettingbox="handleclosesettingbox" @reopensetting="handlereopensetting" />
 		<SearchAnimeBox v-if="ifsearch" @closesearchbox="handleclosesearchbox" />
 
 		<div ref="imageRankTable" class="imageranktable">
@@ -44,9 +75,6 @@
 				<ImageRankTable :index="rankitem.index" v-if="rankitem.index > 0"
 					@opensettingbox="handleopensettingbox" />
 			</template>
-			<!-- <div class="tablefooter">
-				atoposyz.github.io/anime-rank/index.html 动画信息来自Bangumi
-			</div> -->
 		</div>
 
 		<div>
@@ -67,8 +95,8 @@ import AppFooter from './components/Footer.vue';
 import Cookies from 'js-cookie';
 import { store } from '@/utils/store.js'
 import html2canvas from 'html2canvas';
-import * as htmlToImage from 'html-to-image';
-import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
+import { toPng } from 'html-to-image';
+import LZString from "lz-string";
 
 export default {
 	components: {
@@ -86,12 +114,16 @@ export default {
 			ifsearch: false,
 			ifsave: false,
 			ifimport: false,
+			ifcodeshare: false,
+			ifcodeimport: false,
 			writertitle: "填表人OFF",
 			savetitle: '保存',
 			cache_title: '网页缓存',
 			importtitle: "导入",
 			cleartitle: '清空',
 			settingindex: 1,
+			shareCode: '',
+			importCodeInput: '',
 		}
 	},
 	mounted() {
@@ -103,6 +135,11 @@ export default {
 	methods: {
 		change_event_handler() {
 
+		},
+		handlereopensetting(index) {
+			// reopen settings for given index
+			this.settingindex = index;
+			this.ifsetting = true;
 		},
 		add_new_image_into_sorted(new_anime_image_url) {
 			this.sortable_images_urls.push({
@@ -159,16 +196,47 @@ export default {
 				this.importtitle = "导入";
 			}
 		},
+		// save_data_into_cookie(flag = true) {
+		// 	this.set_cookie("rank", JSON.stringify(store.ranklist, null, 2));
+		// 	this.set_cookie("sortable", JSON.stringify(store.sortablelist, null, 2));
+		// 	console.log("saving data into cookie.");
+		// 	if (flag) {
+		// 		alert("已保存！");
+		// 	}
+		// },
 		save_data_into_cookie(flag = true) {
-			this.set_cookie("rank", JSON.stringify(store.ranklist, null, 2));
-			this.set_cookie("sortable", JSON.stringify(store.sortablelist, null, 2));
-			console.log("saving data into cookie.");
+			this.set_local("rank", JSON.stringify(store.ranklist));
+			this.set_local("sortable", JSON.stringify(store.sortablelist));
+
+			// ⭐ 立刻从 localStorage 恢复，符合用户直觉
+			this.load_data_from_cookie();
+
+			console.log("saving data into localStorage.");
 			if (flag) {
 				alert("已保存！");
 			}
 		},
+
+		set_local(key, value) {
+			try {
+				localStorage.setItem(key, value);
+			} catch (e) {
+				console.error('localStorage 写入失败:', e);
+				alert('本地存储失败，可能是空间不足或浏览器限制');
+			}
+		},
+
+		get_local(key) {
+			try {
+				return localStorage.getItem(key);
+			} catch (e) {
+				console.error('localStorage 读取失败:', e);
+				return null;
+			}
+		},
+
 		load_main_data_from_cookie() {
-			const json_string = this.get_cookie("save");
+			const json_string = this.get_local("rank");
 			if (json_string == null || json_string == "") {  // 当前没有可用 json
 				this.save_data_into_cookie(false);           // 存一个进去
 				return;
@@ -178,7 +246,7 @@ export default {
 			console.log("load main data from cookie.");
 		},
 		load_sort_data_from_cookie() {
-			const json_string = this.get_cookie("sort");
+			const json_string = this.get_local("sortable");
 			if (json_string == null || json_string == "") {  // 当前没有可用 json
 				this.save_data_into_cookie(false);           // 存一个进去
 				return;
@@ -191,29 +259,133 @@ export default {
 			this.load_main_data_from_cookie();
 			this.load_sort_data_from_cookie();
 		},
-		captureimg() {
-			const element = this.$refs.imageRankTable;
-			// 克隆整个元素，保留原始网页不受影响
-			var settingsDivs = element.querySelectorAll('div.settings'); // 查找所有 class 为 settings 的 div
-			settingsDivs.forEach(div => div.style.display = "none"); // 删除每一个找到的 div
-			// settingsDivs = element.querySelectorAll("image-rank-row");
-			// settingsDivs.forEach(div => div.style.boxShadow = "");
-			// settingsDivs = element.querySelectorAll("rank-name");
-			// settingsDivs.forEach(div => div.style.boxShadow = "");
-			html2canvas(element, { useCORS: true }).then(canvas => {
-				const link = document.createElement('a');
-				link.href = canvas.toDataURL('image/png');
-				link.download = 'ImageRankTable.png';
-				link.click();
-			});
-			settingsDivs = element.querySelectorAll('div.settings');
-			settingsDivs.forEach(div => div.style.display = "flex");
-			// settingsDivs = element.querySelectorAll("image-rank-row");
-			// settingsDivs.forEach(div => div.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.05)");
-			// settingsDivs = element.querySelectorAll("rank-name");
-			// settingsDivs.forEach(div => div.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.1)");
-			this.changesave();
+		clear_local_cache() {
+			localStorage.removeItem("rank");
+			localStorage.removeItem("sortable");
+			alert("本地缓存已清空");
 		},
+		// captureimg() {
+		// 	const element = this.$refs.imageRankTable;
+		// 	// 克隆整个元素，保留原始网页不受影响
+		// 	var settingsDivs = element.querySelectorAll('div.settings'); // 查找所有 class 为 settings 的 div
+		// 	settingsDivs.forEach(div => div.style.display = "none"); // 删除每一个找到的 div
+		// 	// settingsDivs = element.querySelectorAll("image-rank-row");
+		// 	// settingsDivs.forEach(div => div.style.boxShadow = "");
+		// 	// settingsDivs = element.querySelectorAll("rank-name");
+		// 	// settingsDivs.forEach(div => div.style.boxShadow = "");
+		// 	html2canvas(element, { useCORS: true }).then(canvas => {
+		// 		const link = document.createElement('a');
+		// 		link.href = canvas.toDataURL('image/png');
+		// 		link.download = 'ImageRankTable.png';
+		// 		link.click();
+		// 	});
+		// 	settingsDivs = element.querySelectorAll('div.settings');
+		// 	settingsDivs.forEach(div => div.style.display = "flex");
+		// 	// settingsDivs = element.querySelectorAll("image-rank-row");
+		// 	// settingsDivs.forEach(div => div.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.05)");
+		// 	// settingsDivs = element.querySelectorAll("rank-name");
+		// 	// settingsDivs.forEach(div => div.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.1)");
+		// 	this.changesave();
+		// },
+		async captureimg() {
+			const element = this.$refs.imageRankTable;
+			if (!element) return;
+
+			// 0. 等待字体加载
+			if (document.fonts && document.fonts.ready) {
+				await document.fonts.ready;
+			}
+
+			// 1. 创建深度克隆 (不影响原界面)
+			const clone = element.cloneNode(true);
+
+			// 2. 将克隆节点移出可视区域
+			const container = document.createElement('div');
+			Object.assign(container.style, {
+				position: 'fixed',
+				top: '-10000px',
+				left: '-10000px',
+				width: element.offsetWidth + 'px',
+				height: element.offsetHeight + 'px',
+				zIndex: '-1',
+				background: '#ffffff', // 确保背景白底
+			});
+			container.appendChild(clone);
+			document.body.appendChild(container);
+
+			try {
+				// 3. 隐藏不需要的按钮
+				clone.querySelectorAll('div.settings').forEach(div => div.style.display = 'none');
+				clone.querySelectorAll('.writer input').forEach(input => {
+					// 修复输入框文字在截图时不显示的问题
+					input.setAttribute('value', input.value); 
+				});
+
+				// 4. 【核心修复】手动下载图片并转为 Base64
+				// 这步操作彻底绕过了 html-to-image 的内部缓存和加载器
+				const images = clone.querySelectorAll('img');
+				const tasks = Array.from(images).map(async (img) => {
+					const src = img.src;
+					if (!src || src.startsWith('data:')) return;
+
+					try {
+						// 必须清除 srcset，否则浏览器可能忽略 src 的修改
+						img.removeAttribute('srcset');
+						img.setAttribute('loading', 'eager'); // 强制立即加载
+
+						// 手动 Fetch 图片，加时间戳强制请求最新资源
+						// 注意：图片服务器必须支持 CORS (Access-Control-Allow-Origin)
+						const response = await fetch(src + (src.includes('?') ? '&' : '?') + 't=' + Date.now(), {
+							cache: 'no-cache',
+							mode: 'cors' 
+						});
+
+						const blob = await response.blob();
+						
+						// 将 Blob 转为 Base64
+						const base64Url = await new Promise((resolve, reject) => {
+							const reader = new FileReader();
+							reader.onloadend = () => resolve(reader.result);
+							reader.onerror = reject;
+							reader.readAsDataURL(blob);
+						});
+
+						// 将克隆节点里的 img 替换为 base64
+						img.src = base64Url;
+
+					} catch (err) {
+						console.warn('图片转Base64失败，将使用原链接重试:', src, err);
+						// 失败了不做处理，保留原 src，尽人事听天命
+					}
+				});
+
+				// 等待所有图片转换完成
+				await Promise.all(tasks);
+
+				// 5. 生成截图
+				const dataUrl = await toPng(clone, {
+					backgroundColor: '#ffffff',
+					pixelRatio: window.devicePixelRatio,
+					skipAutoScale: true, // 防止部分情况下缩放导致模糊
+					cacheBust: true,     // 双重保险
+				});
+
+				// 6. 下载
+				const link = document.createElement('a');
+				link.href = dataUrl;
+				link.download = `年度动画分组_${Date.now()}.png`;
+				link.click();
+
+			} catch (e) {
+				console.error('导出图片失败:', e);
+				alert('导出失败：请检查网络或图片是否存在跨域限制。');
+			} finally {
+				// 7. 清理 DOM
+				document.body.removeChild(container);
+				this.changesave();
+			}
+		},
+
 		savejson() {
 			const json = store.DumpJson();
 			const blob = new Blob([json], { type: 'application/json' });
@@ -262,6 +434,80 @@ export default {
 				}
 			}
 		},
+		// 编码数据为分享代码（更短）
+		encodeDataToCode() {
+			try {
+				const data = {
+				rank: store.ranklist,
+				sortable: store.sortablelist,
+				};
+				const jsonStr = JSON.stringify(data);
+
+				// 输出为 URL-safe 的压缩字符串（推荐）
+				const code = LZString.compressToEncodedURIComponent(jsonStr);
+
+				this.shareCode = code;
+				this.ifcodeshare = true;
+			} catch (error) {
+				console.error("编码失败:", error);
+				alert("编码失败，请重试");
+			}
+		},
+
+		// 从分享代码导入数据
+		decodeCodeToData() {
+			try {
+				const input = this.importCodeInput.trim();
+				if (!input) {
+				alert("请粘贴有效的代码");
+				return;
+				}
+
+				const jsonStr = LZString.decompressFromEncodedURIComponent(input);
+				if (!jsonStr) throw new Error("decompress failed");
+
+				const data = JSON.parse(jsonStr);
+				this.loadjson(data.rank);
+				this.loadsortjson(data.sortable);
+
+				alert("导入成功！");
+				this.importCodeInput = "";
+				this.ifcodeimport = false;
+				this.changeimport();
+			} catch (error) {
+				console.error("解码失败:", error);
+				alert("代码无效或已损坏，请检查后重试");
+			}
+		},
+		// 复制分享代码到剪贴板
+		copyShareCode() {
+			this.ifcodeshare = false;
+			navigator.clipboard.writeText(this.shareCode).then(() => {
+				alert('代码已复制到剪贴板！');
+			}).catch(err => {
+				console.error('复制失败:', err);
+				alert('复制失败，请手动复制');
+			});
+		},
+		// 打开分享代码界面
+		openCodeShare() {
+			this.encodeDataToCode();
+		},
+		// 打开导入代码界面
+		openCodeImport() {
+			this.importCodeInput = '';
+			this.ifcodeimport = true;
+		},
+		// 关闭导入代码界面
+		closeCodeImport() {
+			this.ifcodeimport = false;
+			this.importCodeInput = '';
+		},
+		// 关闭分享代码界面
+		closeCodeShare() {
+			this.ifcodeshare = false;
+			this.shareCode = '';
+		},
 	}
 };
 </script>
@@ -272,12 +518,12 @@ export default {
 	max-width: 1000px;
 	margin-left: auto;
 	margin-right: auto;
-	margin-top: 50px;
-	padding: 20px;
-	background-color: #ffffff;
-	border-radius: 10px;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-	border: 1px solid #e0e0e0;
+	margin-top: 40px;
+	padding: 28px;
+	background-color: var(--card-bg);
+	border-radius: var(--radius);
+	box-shadow: 0 8px 30px rgba(15, 30, 50, 0.08);
+	border: 1px solid rgba(16,24,40,0.04);
 }
 
 .site-header {
@@ -307,7 +553,7 @@ export default {
 }
 
 .opt {
-	margin-bottom: 20px;
+	margin-bottom: 18px;
 	text-align: right;
 	margin-right: 5px;
 }
@@ -318,32 +564,34 @@ export default {
 	margin-left: auto;
 	display: flex;
 	justify-content: flex-end;
-	font: 15px sans-serif;
+	font-size: 15px;
+	color: var(--muted);
 }
 
 .writer input {
 	width: auto;
-    min-width: 5px; /* 设置最小宽度 */
-	border: none; 
-	background: none; 
-	padding: 0;
+	min-width: 5px;
+	border: none;
+	background: transparent;
+	padding: 6px 8px;
 	outline: none;
-	font: 15px sans-serif;
+	font-size: 15px;
 }
 
 .imageranktable {
-	margin-top: 50px;
-	padding: 30px;
+	margin-top: 30px;
+	padding: 8px 0;
 }
 
 .tabletitle {
-	font: 30px sans-serif;
-	margin-bottom: 15px;
-	
+	font-size: 28px;
+	font-weight: 600;
+	margin-bottom: 12px;
+	color: var(--primary-600);
 }
 .tablefooter{
-	font: 12px sans-serif;
-	color: #777777;
+	font-size: 12px;
+	color: var(--muted);
 }
 .center {
 	display: flex;
@@ -353,16 +601,23 @@ export default {
 button {
 	position: relative;
 	display: inline-block;
-	background: #d0eeff;
-	border: 1px solid #99d3f5;
-	border-radius: 4px;
-	padding: 4px 12px;
+	background: linear-gradient(180deg, var(--primary) 0%, var(--primary-600) 100%);
+	border: none;
+	color: white;
+	border-radius: 8px;
+	padding: 8px 14px;
 	overflow: hidden;
-	color: #1e88c7;
 	text-decoration: none;
-	text-indent: 0;
 	line-height: 20px;
-	font: 20px sans-serif;
+	font-size: 14px;
+	cursor: pointer;
+	box-shadow: 0 6px 18px rgba(47, 128, 237, 0.12);
+	transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+button:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 10px 24px rgba(47, 128, 237, 0.16);
 }
 
 .file input {
@@ -373,10 +628,167 @@ button {
 	opacity: 0;
 }
 
-.file:hover {
-	background: #aadffd;
-	border-color: #78c3f3;
-	color: #004974;
-	text-decoration: none;
+
+/* 代码分享模态框样式 */
+.code-share-modal {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 999;
 }
+
+.modal-content {
+	background: white;
+	border-radius: 12px;
+	padding: 24px;
+	max-width: 500px;
+	width: 90%;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 16px;
+}
+
+.modal-header h2 {
+	font-size: 20px;
+	margin: 0;
+	color: var(--primary-600);
+}
+
+.close-btn {
+	background: none;
+	border: none;
+	font-size: 24px;
+	cursor: pointer;
+	color: var(--muted);
+	padding: 0;
+	width: 32px;
+	height: 32px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 6px;
+	transition: background 0.2s ease;
+}
+
+.close-btn:hover {
+	background: rgba(0, 0, 0, 0.05);
+	transform: none;
+	box-shadow: none;
+}
+
+.modal-body {
+	text-align: center;
+}
+
+.modal-hint {
+	font-size: 14px;
+	color: var(--muted);
+	margin-bottom: 12px;
+}
+
+.share-code-textarea {
+	width: 80%;
+	height: 120px;
+	padding: 12px;
+	border: 1px solid rgba(16, 24, 40, 0.1);
+	border-radius: 8px;
+	font-family: monospace;
+	font-size: 12px;
+	resize: none;
+	margin-bottom: 12px;
+}
+
+.copy-btn {
+	width: 100%;
+	padding: 10px;
+	background: var(--primary);
+	color: white;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 14px;
+	transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.copy-btn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 20px rgba(79, 156, 224, 0.2);
+}
+
+/* 代码导入模态框样式 */
+.code-import-modal {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 998;
+}
+
+.modal-content-import {
+	background: white;
+	border-radius: 12px;
+	padding: 24px;
+	max-width: 500px;
+	width: 90%;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-body-import {
+	text-align: left;
+}
+
+.modal-body-import p {
+	margin-bottom: 12px;
+	font-size: 14px;
+	color: var(--muted);
+}
+
+.import-code-textarea {
+	width: 80%;
+	height: 120px;
+	padding: 12px;
+	border: 1px solid rgba(16, 24, 40, 0.1);
+	border-radius: 8px;
+	font-family: monospace;
+	font-size: 12px;
+	resize: none;
+	margin-bottom: 12px;
+}
+
+.import-btn {
+	width: 100%;
+	padding: 10px;
+	background: var(--primary);
+	color: white;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 14px;
+	transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.import-btn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 20px rgba(79, 156, 224, 0.2);
+}
+.imageranktable{
+  background: #fff;
+}
+
 </style>

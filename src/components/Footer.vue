@@ -68,6 +68,7 @@ export default {
 .footer-copyright {
     margin-top: 0;
     font-size: 0.9em;
+    color: var(--muted);
 }
 
 .footer a { color: #2b6cb0; }
