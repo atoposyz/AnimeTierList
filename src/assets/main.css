@@ -1,76 +1,39 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 @import './base.css';
 
-/* Layout container */
 #app {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
+  min-height: 100vh;
   font-weight: 400;
-  padding: 24px;
 }
 
-/* layout helper container used by components */
 .container {
-  max-width: 1100px;
+  width: min(1120px, calc(100% - 32px));
   margin-left: auto;
   margin-right: auto;
-  padding: 0 1rem;
 }
 
-/* Links */
 a {
   text-decoration: none;
-  color: var(--muted);
-  transition: color 0.25s ease, transform 0.15s ease;
-  padding: 3px;
+  color: inherit;
+  transition: color 0.2s ease;
 }
 
-/* buttons */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
+input[type="text"],
+textarea {
+  border: 1px solid rgba(31, 41, 55, 0.12);
   border-radius: 8px;
-  border: 1px solid transparent;
-  background: #f3f9ff;
-  color: #0b63a8;
-  cursor: pointer;
-  transition: background 0.18s ease, transform 0.12s ease, box-shadow 0.12s ease;
-}
-.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(16,24,40,0.06); }
-.btn-primary { background: #1e88c7; color: #fff; }
-.btn-ghost { background: transparent; border-color: rgba(0,0,0,0.06); color: #334155; }
-
-input[type="text"], textarea {
-  border: 1px solid rgba(16,24,40,0.06);
-  padding: 6px 8px;
-  border-radius: 6px;
   outline: none;
 }
-input[type="text"]:focus, textarea:focus { box-shadow: 0 6px 18px rgba(16,24,40,0.06); border-color: rgba(30,136,199,0.18); }
+
+input[type="text"]:focus,
+textarea:focus {
+  border-color: rgba(35, 111, 134, 0.42);
+  box-shadow: 0 0 0 4px rgba(35, 111, 134, 0.10);
+}
 
 @media (hover: hover) {
   a:hover {
-    color: var(--primary-600);
-    transform: translateY(-1px);
-  }
-}
-
-/* Page background for larger screens */
-@media (min-width: 768px) {
-  body {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    background: #DDD;
-    padding: 2rem 0;
-  }
-
-  #app {
-    width: min(1200px, 100%);
-    display: block;
-    padding: 0 1.5rem;
+    color: #236f86;
   }
 }

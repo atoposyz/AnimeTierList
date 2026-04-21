@@ -1,14 +1,13 @@
-/* color palette from <https://github.com/vuejs/theme> */
 :root {
   --vt-c-white: #ffffff;
-  --vt-c-white-soft: #f8f8f8;
-  --vt-c-white-mute: #f2f2f2;
+  --vt-c-white-soft: #f8fafc;
+  --vt-c-white-mute: #eef2f6;
 
   --vt-c-black: #181818;
   --vt-c-black-soft: #222222;
   --vt-c-black-mute: #282828;
 
-  --vt-c-indigo: #2c3e50;
+  --vt-c-indigo: #1f2937;
 
   --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
   --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
@@ -21,7 +20,6 @@
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
 }
 
-/* semantic color variables for this project */
 :root {
   --color-background: var(--vt-c-white);
   --color-background-soft: var(--vt-c-white-soft);
@@ -36,32 +34,18 @@
   --section-gap: 160px;
 }
 
-/* Project visual tokens */
 :root {
-  --primary: #4f9ce0; /* 主色调 */
-  --primary-600: #2b85d6;
-  --radius: 12px;
+  --primary: #236f86;
+  --primary-600: #19596d;
+  --radius: 10px;
   --card-bg: var(--vt-c-white);
-  --muted: #6b7280;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: var(--vt-c-black);
-    --color-background-soft: var(--vt-c-black-soft);
-    --color-background-mute: var(--vt-c-black-mute);
-
-    --color-border: var(--vt-c-divider-dark-2);
-    --color-border-hover: var(--vt-c-divider-dark-1);
-
-    --color-heading: var(--vt-c-text-dark-1);
-    --color-text: var(--vt-c-text-dark-2);
-  }
+  --muted: #667085;
 }
 
 *,
 *::before,
 *::after {
+  box-sizing: border-box;
   margin: 0;
   font-weight: normal;
 }
@@ -69,13 +53,11 @@
 body {
   min-height: 100vh;
   color: var(--color-text);
-  background: var(--color-background);
-  transition:
-    color 0.5s,
-    background-color 0.5s;
+  background: #f7f9fc;
   line-height: 1.6;
   font-family:
     Inter,
+    'Noto Sans SC',
     -apple-system,
     BlinkMacSystemFont,
     'Segoe UI',
@@ -91,4 +73,10 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
 }

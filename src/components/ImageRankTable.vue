@@ -1,13 +1,18 @@
-<!-- src/components/SortableImageList.vue -->
 <template>
   <div class="image-rank-row">
-    <div class="rank-name" :style="{ 'background-color': store.ranklist[index].color }" contenteditable="true" @input="onNameInput($event)">
+    <div
+      class="rank-name"
+      :style="{ 'background-color': store.ranklist[index].color }"
+      contenteditable="true"
+      spellcheck="false"
+      @input="onNameInput($event)"
+    >
       {{ store.ranklist[index].name }}
     </div>
-    <ImageListZone class="image-list" :index="index" :key="index" @change-event="emit_change_event"/>
-    <div class="settings" @click="opensettingbox(index)">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="36" height="36" fill="currentColor"><path d="M12 1L21.5 6.5V17.5L12 23L2.5 17.5V6.5L12 1ZM12 3.311L4.5 7.65311V16.3469L12 20.689L19.5 16.3469V7.65311L12 3.311ZM12 16C9.79086 16 8 14.2091 8 12C8 9.79086 9.79086 8 12 8C14.2091 8 16 9.79086 16 12C16 14.2091 14.2091 16 12 16ZM12 14C13.1046 14 14 13.1046 14 12C14 10.8954 13.1046 10 12 10C10.8954 10 10 10.8954 10 12C10 13.1046 10.8954 14 12 14Z"></path></svg>
-    </div>
+    <ImageListZone class="image-list" :index="index" :key="index" @change-event="emit_change_event" />
+    <button class="settings" @click="opensettingbox(index)" aria-label="编辑当前分级">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 1L21.5 6.5V17.5L12 23L2.5 17.5V6.5L12 1ZM12 3.311L4.5 7.65311V16.3469L12 20.689L19.5 16.3469V7.65311L12 3.311ZM12 16C9.79086 16 8 14.2091 8 12C8 9.79086 9.79086 8 12 8C14.2091 8 16 9.79086 16 12C16 14.2091 14.2091 16 12 16ZM12 14C13.1046 14 14 13.1046 14 12C14 10.8954 13.1046 10 12 10C10.8954 10 10 10.8954 10 12C10 13.1046 10.8954 14 12 14Z"></path></svg>
+    </button>
   </div>
 </template>
 
@@ -30,16 +35,8 @@ export default {
       this.$emit("change-event", data);
     },
     opensettingbox(index) {
-      console.log("try to opensettingbox No." + index);
       this.$emit("opensettingbox", index);
-    //   const newImageSrc = prompt('请输入新图片的URL:')
-    //   if (newImageSrc) {
-    //     this.images.push({ src: newImageSrc })
-    //   }
-    //   // 此处信息发生了改变，应该考虑更新 cookie
-    //   this.emit_change_event("");
-    }
-    ,
+    },
     onNameInput(e) {
       const text = (e.target && e.target.innerText) ? e.target.innerText.trim() : '';
       if (typeof this.index === 'number' && this.store && this.store.ranklist && this.store.ranklist[this.index]) {
@@ -52,75 +49,80 @@ export default {
 
 <style scoped>
 .image-rank-row {
-  min-height: 120px;
-  display: flex;
-  gap: 8px;
-  margin-bottom: 2px;
-  min-width: 400px;
-  background-color: var(--card-bg);    /* 卡片背景 */
-  padding: 14px;
-  border-radius: calc(var(--radius) - 4px);            /* 圆角 */
-  box-shadow: 0 6px 18px rgba(20,30,50,0.06);
+  display: grid;
+  grid-template-columns: 132px minmax(260px, 1fr) 42px;
+  gap: 10px;
+  min-height: 122px;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid rgba(31, 41, 55, 0.08);
+  border-radius: 10px;
+  background: #fbfcfd;
+  box-shadow: 0 8px 20px rgba(31, 41, 55, 0.05);
 }
 
 .image-rank-row:nth-child(even) {
-  background-color: rgba(15, 30, 50, 0.02);
+  background: #f7fafb;
 }
 
 .rank-name {
   display: flex;
-  width: 120px;
-  background-color: var(--card-bg);
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   min-height: 100px;
-  border-radius: 10px;
-  position: relative; /* 使伪元素绝对定位不影响内容流 */
-  transition: box-shadow 0.25s ease, transform 0.18s ease;
-}
-
-.rank-name:hover {
-  box-shadow: 0 8px 22px rgba(16, 24, 40, 0.08);
-  transform: translateY(-4px);
-}
-
-.rank-name::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 6px; /* 距离底部一定高度，避免影响垂直居中 */
-  height: 6px;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-  pointer-events: none;
-}
-
-.label {
+  padding: 10px;
+  border-radius: 8px;
+  color: #111827;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1.2;
   text-align: center;
-  margin: 0 auto;
-  font-size: 15px;
-  font-weight: 600;
+  word-break: break-word;
+  outline: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.42);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
 }
 
-.image-rank-row .image-list {
-  display: flex;
-  flex-wrap: wrap;
-  width: 80%;
-  gap: 2px;
+.rank-name:hover,
+.rank-name:focus {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.58),
+    0 10px 20px rgba(31, 41, 55, 0.08);
 }
 
-.image-rank-row .settings {
-  display: flex;
-  width: 10%;
-  justify-content: center;
+.image-list {
+  min-width: 0;
+}
+
+.settings {
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  width: 42px;
+  border: 1px solid rgba(31, 41, 55, 0.08);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #667085;
   cursor: pointer;
-  color: var(--muted);
+  transition: color 0.16s ease, background 0.16s ease, transform 0.16s ease;
 }
 
-.image-rank-row .settings:hover {
-  color: var(--primary-600);
-  transform: translateY(-2px);
+.settings:hover {
+  color: #236f86;
+  background: #eef7f8;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 680px) {
+  .image-rank-row {
+    grid-template-columns: 90px minmax(220px, 1fr) 38px;
+    min-width: 430px;
+  }
+
+  .rank-name {
+    font-size: 15px;
+  }
 }
 </style>

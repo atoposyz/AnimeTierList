@@ -1,30 +1,25 @@
 <template>
-    <footer class = "footer">
-        <div class = "center morelink">
-            <a href="https://atoposyz.github.io"> 返回主站</a>
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="https://atoposyz.github.io">返回主站</a>
+            <a href="https://github.com/atoposyz/AnimeTierList" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://bgm.tv/" target="_blank" rel="noopener">Bangumi</a>
         </div>
-        <div class="beian center" m="y-2">
-            <a href="https://icp.gov.moe/?keyword=20240313" target="_blank" rel="noopener"
-                style="display: flex; padding-right: 5px;">
-                <img style="width:24px;height:24px;margin-bottom:-8px" src="https://icp.gov.moe/favicon.ico">
+        <div class="beian">
+            <a href="https://icp.gov.moe/?keyword=20240313" target="_blank" rel="noopener">
+                <img src="https://icp.gov.moe/favicon.ico" alt="">
                 萌ICP备20240313号
             </a>
-            |
-            <a style="text-decoration:none; display: flex; padding-left: 5px;"
-                href="https://travel.moe/go.html" title="异次元之旅-跃迁-我们一起去萌站成员的星球旅行吧！" target="_blank">
-                <img src="https://travel.moe/images/icon/icon64green.png" style="width:24px;height:24px">
+            <span>|</span>
+            <a href="https://travel.moe/go.html" title="异次元之旅" target="_blank" rel="noopener">
+                <img src="https://travel.moe/images/icon/icon64green.png" alt="">
                 异次元之旅
             </a>
         </div>
-        <div class="inspire center">
-            <span>Inspired by <a href="https://tiermaker.com/">TierMaker</a> & <a
-                href="https://lab.magiconch.com/anime-grid/">动画生涯个人喜好表</a>.</span>
+        <div class="inspire">
+            Inspired by <a href="https://tiermaker.com/" target="_blank" rel="noopener">TierMaker</a> &
+            <a href="https://lab.magiconch.com/anime-grid/" target="_blank" rel="noopener">动画生涯个人喜好表</a>.
         </div>
-        <div class="footer-copyright center">
-            <span><a href="https://github.com/atoposyz/AnimeTierList" target="_blank">GitHub</a>
-             动画信息来自 <a href="https://bgm.tv/" target="_blank">Bangumi</a></span>
-        </div>
-        
     </footer>
 </template>
 
@@ -36,41 +31,46 @@ export default {
 
 <style scoped>
 .footer {
-    padding: 24px 12px;
+    display: grid;
+    gap: 12px;
+    max-width: 1120px;
+    margin: 18px auto 0;
+    padding: 20px 12px 8px;
+    color: #667085;
     text-align: center;
-    margin-top: 18px;
-    background: transparent;
-    color: #666;
+    font-size: 13px;
 }
 
-.morelink{
-    font: 26px 'Noto Sans SC', 'Inter', sans-serif;
-    margin-bottom: 18px;
-    color: #4b5563;
-}
-
-.center {
+.footer-links,
+.beian {
     display: flex;
-    justify-content: center;
-}
-
-.footer .container {
-    display: flex;
-    flex-direction: column;
     align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
-.footer-content {
-    max-width: 1200px;
-    width: 100%;
+.footer-links a {
+    color: #236f86;
+    font-weight: 800;
 }
 
-.footer-copyright {
-    margin-top: 0;
-    font-size: 0.9em;
-    color: var(--muted);
+.beian a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 }
 
-.footer a { color: #2b6cb0; }
-.footer a:hover { text-decoration: underline; }
+.beian img {
+    width: 20px;
+    height: 20px;
+}
+
+.footer a {
+    color: #236f86;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
 </style>

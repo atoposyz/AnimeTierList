@@ -1,10 +1,9 @@
-<!-- src/components/SortableImageList.vue -->
 <template>
   <div class="sortable-image-list">
-    <ImageListZone ref="imageListZone" :index="0" @change-event="emit_change_event"/>
-    <div class="add-image" @click="addImage">
+    <ImageListZone ref="imageListZone" class="pool-list" :index="0" @change-event="emit_change_event" />
+    <button class="add-image" @click="addImage" aria-label="添加动画">
       <span>+</span>
-    </div>
+    </button>
   </div>
 </template>
 
@@ -14,10 +13,6 @@ import ImageListZone from './ImageListZone.vue';
 export default {
   components: {
     ImageListZone,
-  },
-  data() {
-    return {
-    };
   },
   methods: {
     emit_change_event(data) {
@@ -32,38 +27,51 @@ export default {
 
 <style scoped>
 .sortable-image-list {
-  margin-top: 10px;
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) 104px;
+  gap: 12px;
   min-height: 120px;
-  display: flex;
-  gap: 10px;
-  min-width: 400px;
+}
+
+.pool-list {
+  min-width: 0;
 }
 
 .add-image {
-  width: 100px;
-  height: 100px;
-  background-size: cover;
-  background-position: center;
+  width: 104px;
+  min-height: 104px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px dashed rgba(16,24,40,0.08);
-  cursor: pointer;
-  background-color: rgba(15, 30, 50, 0.03);
-  margin: auto 10px auto auto;
+  border: 2px dashed rgba(35, 111, 134, 0.28);
   border-radius: 10px;
-  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+  background: #f2fafb;
+  color: #236f86;
+  cursor: pointer;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
 }
 
 .add-image span {
-  font-size: 28px;
-  color: var(--muted);
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1;
 }
 
 .add-image:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 22px rgba(18, 115, 241, 0.08);
-  background: linear-gradient(180deg, rgba(79,156,224,0.12), rgba(79,156,224,0.06));
-  color: var(--primary-600);
+  transform: translateY(-2px);
+  background: #e3f4f6;
+  box-shadow: 0 12px 24px rgba(35, 111, 134, 0.13);
+}
+
+@media (max-width: 680px) {
+  .sortable-image-list {
+    grid-template-columns: minmax(240px, 1fr) 88px;
+    min-width: 350px;
+  }
+
+  .add-image {
+    width: 88px;
+    min-height: 88px;
+  }
 }
 </style>

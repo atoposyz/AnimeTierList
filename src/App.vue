@@ -1,87 +1,112 @@
 <template>
 	<div class="app-root">
 		<header class="site-header">
-			<div class="container">
-				<h1>年度动画我来排</h1>
-				<p class="subtitle">把你喜欢的动画排成心中的排行榜</p>
+			<div class="container header-inner">
+				<div>
+					<p class="eyebrow">Anime Tier List</p>
+					<h1>年度动画分级表</h1>
+					<p class="subtitle">搜索番剧海报，拖拽到不同等级里，整理属于你的年度动画榜单。</p>
+				</div>
+				<div class="header-stats">
+					<span>{{ rankedCount }} 已分级</span>
+					<span>{{ waitingCount }} 待排序</span>
+				</div>
 			</div>
 		</header>
 
-		<div class="home" @mouseup="change_event_handler">
-		<div class="opt">
-			<div class="in-output">
-				<button @click="writer" v-show="!ifimport && !ifsave">{{ writertitle }}</button>
-				<button @click="clearcontent" v-show="!ifimport && !ifsave">{{ cleartitle }}</button>
-				<button @click="changesave" v-show="!ifimport">{{ savetitle }}</button>
-				<button @click="changeimport" v-show="!ifsave">{{ importtitle }}</button>
-			</div>
-			<div class="save-as" v-show="ifsave">
-				<button @click="save_data_into_cookie">{{ cache_title }}</button>
-				<button @click="savejson">json</button>
-				<button @click="captureimg">image</button>
-				<button @click="openCodeShare">代码</button>
-			</div>
-			<div class="importopt" v-show="ifimport">
-				<button @click="openCodeImport">代码</button>
-				<button class="file"><input type="file" @change="handleFileUpload" accept=".json" />json</button>
-			</div>
-			<div class="zhanweifu" v-show="!ifsave & !ifimport">
-				<button style="border: 0; padding: 0; background-color: rgba(0, 0, 0, 0)"></button>
-			</div>
-		</div>
+		<main class="home" @mouseup="change_event_handler">
+			<section class="toolbar" aria-label="工具栏">
+				<div class="toolbar-copy">
+					<strong>编辑面板</strong>
+					<span>支持拖拽排序、导入导出、生成分享码与截图。</span>
+				</div>
 
-		<!-- 代码分享模态框 -->
-		<div class="code-share-modal" v-show="ifcodeshare">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h2>分享代码</h2>
-					<button class="close-btn" @click="closeCodeShare">✕</button>
+				<div class="opt">
+					<div class="action-group" v-show="!ifimport && !ifsave">
+						<button class="btn btn-soft" @click="writer">{{ writertitle }}</button>
+						<button class="btn btn-danger-soft" @click="clearcontent">{{ cleartitle }}</button>
+					</div>
+					<div class="action-group">
+						<button class="btn" @click="changesave" v-show="!ifimport">{{ savetitle }}</button>
+						<button class="btn btn-secondary" @click="changeimport" v-show="!ifsave">{{ importtitle }}</button>
+					</div>
+					<div class="action-group expanded" v-show="ifsave">
+						<button class="btn btn-soft" @click="save_data_into_cookie">{{ cache_title }}</button>
+						<button class="btn btn-soft" @click="savejson">导出 JSON</button>
+						<button class="btn btn-soft" @click="captureimg">导出图片</button>
+						<button class="btn btn-soft" @click="openCodeShare">分享码</button>
+					</div>
+					<div class="action-group expanded" v-show="ifimport">
+						<button class="btn btn-soft" @click="openCodeImport">导入分享码</button>
+						<button class="btn btn-soft file">
+							<input type="file" @change="handleFileUpload" accept=".json" />
+							导入 JSON
+						</button>
+					</div>
 				</div>
-				<div class="modal-body">
-					<p class="modal-hint">复制下面的代码分享给朋友，他们粘贴到"代码导入"就能恢复你的数据</p>
-					<textarea class="share-code-textarea" readonly :value="shareCode"></textarea>
-					<button class="copy-btn" @click="copyShareCode">复制代码</button>
-				</div>
-			</div>
-		</div>
+			</section>
 
-		<!-- 代码导入弹窗 -->
-		<div class="code-import-modal" v-show="ifcodeimport">
-			<div class="modal-content-import">
-				<div class="modal-header">
-					<h3>导入代码</h3>
-					<button class="close-btn" @click="closeCodeImport">✕</button>
-				</div>
-				<div class="modal-body-import">
-					<p>粘贴别人分享的代码：</p>
-					<textarea v-model="importCodeInput" class="import-code-textarea" placeholder="粘贴分享代码"></textarea>
-					<button class="import-btn" @click="decodeCodeToData">导入数据</button>
+			<div class="code-share-modal" v-show="ifcodeshare">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h2>分享当前榜单</h2>
+						<button class="close-btn" @click="closeCodeShare" aria-label="关闭">×</button>
+					</div>
+					<div class="modal-body">
+						<p class="modal-hint">复制下面的分享码发给朋友，对方在“导入分享码”中粘贴即可恢复榜单。</p>
+						<textarea class="share-code-textarea" readonly :value="shareCode"></textarea>
+						<button class="btn modal-action" @click="copyShareCode">复制分享码</button>
+					</div>
 				</div>
 			</div>
-		</div>
 
-		<RowSettingBox v-if="ifsetting" :index="this.settingindex" @closesettingbox="handleclosesettingbox" @reopensetting="handlereopensetting" />
-		<SearchAnimeBox v-if="ifsearch" @closesearchbox="handleclosesearchbox" />
-
-		<div ref="imageRankTable" class="imageranktable">
-			<div class="tabletitle center">
-				年度动画分组
+			<div class="code-import-modal" v-show="ifcodeimport">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h2>导入分享码</h2>
+						<button class="close-btn" @click="closeCodeImport" aria-label="关闭">×</button>
+					</div>
+					<div class="modal-body">
+						<p class="modal-hint">粘贴别人分享的代码，导入后会替换当前榜单数据。</p>
+						<textarea v-model="importCodeInput" class="import-code-textarea" placeholder="在这里粘贴分享码"></textarea>
+						<button class="btn modal-action" @click="decodeCodeToData">导入数据</button>
+					</div>
+				</div>
 			</div>
-			<div class="writer" v-show="iwriter">
-				<span>填表人：</span>
-				<input type="text" placeholder="写上你的名字" size="10rem" oninput="this.style.width = (this.value.length>18?this.value.length:10) + 'rem';">
-			</div>
-			<template v-for="rankitem in store.ranklist" :key="rankitem.index">
-				<ImageRankTable :index="rankitem.index" v-if="rankitem.index > 0"
-					@opensettingbox="handleopensettingbox" />
-			</template>
-		</div>
 
-		<div>
-			<SortableImageList ref="sortableImageList" @opensearchbox="handleopensearchbox" />
-		</div>
-		<div ref="combinedContainer" class="combined-container" style="display: none"></div>
-		</div>
+			<RowSettingBox v-if="ifsetting" :index="this.settingindex" @closesettingbox="handleclosesettingbox" @reopensetting="handlereopensetting" />
+			<SearchAnimeBox v-if="ifsearch" @closesearchbox="handleclosesearchbox" />
+
+			<div ref="imageRankTable" class="imageranktable">
+				<div class="table-heading">
+					<div>
+						<p class="section-label">Tier Board</p>
+						<h2>动画分组</h2>
+					</div>
+					<div class="writer" v-show="iwriter">
+						<span>填表人</span>
+						<input type="text" placeholder="写上你的名字" size="10rem" oninput="this.style.width = (this.value.length>18?this.value.length:10) + 'rem';">
+					</div>
+				</div>
+				<template v-for="rankitem in store.ranklist" :key="rankitem.index">
+					<ImageRankTable :index="rankitem.index" v-if="rankitem.index > 0"
+						@opensettingbox="handleopensettingbox" />
+				</template>
+			</div>
+
+			<section class="pool-panel">
+				<div class="pool-heading">
+					<div>
+						<p class="section-label">Waiting Pool</p>
+						<h2>待排序动画</h2>
+					</div>
+					<span>点击加号添加番剧，拖到上方分级行中。</span>
+				</div>
+				<SortableImageList ref="sortableImageList" @opensearchbox="handleopensearchbox" />
+			</section>
+
+			<div ref="combinedContainer" class="combined-container" style="display: none"></div>
+		</main>
 		<AppFooter />
 	</div>
 </template>
@@ -94,7 +119,6 @@ import SearchAnimeBox from '@/components/SearchAnimeBox.vue';
 import AppFooter from './components/Footer.vue';
 import Cookies from 'js-cookie';
 import { store } from '@/utils/store.js'
-import html2canvas from 'html2canvas';
 import { toPng } from 'html-to-image';
 import LZString from "lz-string";
 
@@ -116,28 +140,30 @@ export default {
 			ifimport: false,
 			ifcodeshare: false,
 			ifcodeimport: false,
-			writertitle: "填表人OFF",
-			savetitle: '保存',
-			cache_title: '网页缓存',
+			writertitle: "显示填表人",
+			savetitle: '保存 / 导出',
+			cache_title: '保存到本地',
 			importtitle: "导入",
-			cleartitle: '清空',
+			cleartitle: '清空分级',
 			settingindex: 1,
 			shareCode: '',
 			importCodeInput: '',
 		}
 	},
-	mounted() {
-		// this.empty_ranklist = JSON.parse(JSON.stringify(this.ranklist)); // 记录初始值
-		this.load_data_from_cookie();                                    // 初始化时：试图从 cookie 加载上次的历史信息
+	computed: {
+		waitingCount() {
+			return this.store.ranklist[0]?.urls?.length || 0;
+		},
+		rankedCount() {
+			return this.store.ranklist.slice(1).reduce((sum, item) => sum + (item.urls?.length || 0), 0);
+		},
 	},
-	beforeUnmount() {
+	mounted() {
+		this.load_data_from_cookie();
 	},
 	methods: {
-		change_event_handler() {
-
-		},
+		change_event_handler() {},
 		handlereopensetting(index) {
-			// reopen settings for given index
 			this.settingindex = index;
 			this.ifsetting = true;
 		},
@@ -146,18 +172,17 @@ export default {
 				src: new_anime_image_url
 			});
 		},
-		clear_ranklist() { // 清空整个 ranklist
+		clear_ranklist() {
 			store.ClearRankList();
 		},
 		set_cookie(name, value) {
-			Cookies.set(name, value, { expires: 30 }); // 30 天后过期
+			Cookies.set(name, value, { expires: 30 });
 		},
 		get_cookie(name) {
-			return Cookies.get(name); // 获取指定名称的 cookie
+			return Cookies.get(name);
 		},
 		handleopensettingbox(index) {
 			this.settingindex = index;
-			console.log("receive trying opensettingbox No." + this.settingindex);
 			this.ifsetting = true;
 		},
 		handleclosesettingbox() {
@@ -171,49 +196,26 @@ export default {
 		},
 		writer() {
 			this.iwriter = !this.iwriter;
-			if(this.iwriter) {
-				this.writertitle = "填表人ON";
-			} else {
-				this.writertitle = "填表人OFF";
-			}
+			this.writertitle = this.iwriter ? "隐藏填表人" : "显示填表人";
 		},
 		clearcontent() {
 			store.ClearRankList();
 		},
 		changesave() {
 			this.ifsave = !this.ifsave;
-			if (this.ifsave) {
-				this.savetitle = '取消';
-			} else {
-				this.savetitle = '保存';
-			}
+			this.savetitle = this.ifsave ? '收起保存' : '保存 / 导出';
 		},
 		changeimport() {
 			this.ifimport = !this.ifimport;
-			if (this.ifimport) {
-				this.importtitle = "取消";
-			} else {
-				this.importtitle = "导入";
-			}
+			this.importtitle = this.ifimport ? "收起导入" : "导入";
 		},
-		// save_data_into_cookie(flag = true) {
-		// 	this.set_cookie("rank", JSON.stringify(store.ranklist, null, 2));
-		// 	this.set_cookie("sortable", JSON.stringify(store.sortablelist, null, 2));
-		// 	console.log("saving data into cookie.");
-		// 	if (flag) {
-		// 		alert("已保存！");
-		// 	}
-		// },
 		save_data_into_cookie(flag = true) {
 			this.set_local("rank", JSON.stringify(store.ranklist));
 			this.set_local("sortable", JSON.stringify(store.sortablelist));
-
-			// ⭐ 立刻从 localStorage 恢复，符合用户直觉
 			this.load_data_from_cookie();
 
-			console.log("saving data into localStorage.");
 			if (flag) {
-				alert("已保存！");
+				alert("已保存到本地！");
 			}
 		},
 
@@ -222,7 +224,7 @@ export default {
 				localStorage.setItem(key, value);
 			} catch (e) {
 				console.error('localStorage 写入失败:', e);
-				alert('本地存储失败，可能是空间不足或浏览器限制');
+				alert('本地存储失败，可能是空间不足或浏览器限制。');
 			}
 		},
 
@@ -237,23 +239,21 @@ export default {
 
 		load_main_data_from_cookie() {
 			const json_string = this.get_local("rank");
-			if (json_string == null || json_string == "") {  // 当前没有可用 json
-				this.save_data_into_cookie(false);           // 存一个进去
+			if (json_string == null || json_string == "") {
+				this.save_data_into_cookie(false);
 				return;
 			}
 			const json_object = JSON.parse(json_string);
 			this.loadjson(json_object);
-			console.log("load main data from cookie.");
 		},
 		load_sort_data_from_cookie() {
 			const json_string = this.get_local("sortable");
-			if (json_string == null || json_string == "") {  // 当前没有可用 json
-				this.save_data_into_cookie(false);           // 存一个进去
+			if (json_string == null || json_string == "") {
+				this.save_data_into_cookie(false);
 				return;
 			}
 			const json_object = JSON.parse(json_string);
 			this.loadsortjson(json_object);
-			console.log("load sort data from cookie.");
 		},
 		load_data_from_cookie() {
 			this.load_main_data_from_cookie();
@@ -262,44 +262,17 @@ export default {
 		clear_local_cache() {
 			localStorage.removeItem("rank");
 			localStorage.removeItem("sortable");
-			alert("本地缓存已清空");
+			alert("本地缓存已清空。");
 		},
-		// captureimg() {
-		// 	const element = this.$refs.imageRankTable;
-		// 	// 克隆整个元素，保留原始网页不受影响
-		// 	var settingsDivs = element.querySelectorAll('div.settings'); // 查找所有 class 为 settings 的 div
-		// 	settingsDivs.forEach(div => div.style.display = "none"); // 删除每一个找到的 div
-		// 	// settingsDivs = element.querySelectorAll("image-rank-row");
-		// 	// settingsDivs.forEach(div => div.style.boxShadow = "");
-		// 	// settingsDivs = element.querySelectorAll("rank-name");
-		// 	// settingsDivs.forEach(div => div.style.boxShadow = "");
-		// 	html2canvas(element, { useCORS: true }).then(canvas => {
-		// 		const link = document.createElement('a');
-		// 		link.href = canvas.toDataURL('image/png');
-		// 		link.download = 'ImageRankTable.png';
-		// 		link.click();
-		// 	});
-		// 	settingsDivs = element.querySelectorAll('div.settings');
-		// 	settingsDivs.forEach(div => div.style.display = "flex");
-		// 	// settingsDivs = element.querySelectorAll("image-rank-row");
-		// 	// settingsDivs.forEach(div => div.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.05)");
-		// 	// settingsDivs = element.querySelectorAll("rank-name");
-		// 	// settingsDivs.forEach(div => div.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.1)");
-		// 	this.changesave();
-		// },
 		async captureimg() {
 			const element = this.$refs.imageRankTable;
 			if (!element) return;
 
-			// 0. 等待字体加载
 			if (document.fonts && document.fonts.ready) {
 				await document.fonts.ready;
 			}
 
-			// 1. 创建深度克隆 (不影响原界面)
 			const clone = element.cloneNode(true);
-
-			// 2. 将克隆节点移出可视区域
 			const container = document.createElement('div');
 			Object.assign(container.style, {
 				position: 'fixed',
@@ -308,41 +281,33 @@ export default {
 				width: element.offsetWidth + 'px',
 				height: element.offsetHeight + 'px',
 				zIndex: '-1',
-				background: '#ffffff', // 确保背景白底
+				background: '#ffffff',
 			});
 			container.appendChild(clone);
 			document.body.appendChild(container);
 
 			try {
-				// 3. 隐藏不需要的按钮
 				clone.querySelectorAll('div.settings').forEach(div => div.style.display = 'none');
 				clone.querySelectorAll('.writer input').forEach(input => {
-					// 修复输入框文字在截图时不显示的问题
-					input.setAttribute('value', input.value); 
+					input.setAttribute('value', input.value);
 				});
 
-				// 4. 【核心修复】手动下载图片并转为 Base64
-				// 这步操作彻底绕过了 html-to-image 的内部缓存和加载器
 				const images = clone.querySelectorAll('img');
 				const tasks = Array.from(images).map(async (img) => {
 					const src = img.src;
 					if (!src || src.startsWith('data:')) return;
 
 					try {
-						// 必须清除 srcset，否则浏览器可能忽略 src 的修改
 						img.removeAttribute('srcset');
-						img.setAttribute('loading', 'eager'); // 强制立即加载
+						img.setAttribute('loading', 'eager');
 
-						// 手动 Fetch 图片，加时间戳强制请求最新资源
-						// 注意：图片服务器必须支持 CORS (Access-Control-Allow-Origin)
 						const response = await fetch(src + (src.includes('?') ? '&' : '?') + 't=' + Date.now(), {
 							cache: 'no-cache',
-							mode: 'cors' 
+							mode: 'cors'
 						});
 
 						const blob = await response.blob();
-						
-						// 将 Blob 转为 Base64
+
 						const base64Url = await new Promise((resolve, reject) => {
 							const reader = new FileReader();
 							reader.onloadend = () => resolve(reader.result);
@@ -350,37 +315,29 @@ export default {
 							reader.readAsDataURL(blob);
 						});
 
-						// 将克隆节点里的 img 替换为 base64
 						img.src = base64Url;
-
 					} catch (err) {
-						console.warn('图片转Base64失败，将使用原链接重试:', src, err);
-						// 失败了不做处理，保留原 src，尽人事听天命
+						console.warn('图片转为 Base64 失败，将尝试使用原链接:', src, err);
 					}
 				});
 
-				// 等待所有图片转换完成
 				await Promise.all(tasks);
 
-				// 5. 生成截图
 				const dataUrl = await toPng(clone, {
 					backgroundColor: '#ffffff',
 					pixelRatio: window.devicePixelRatio,
-					skipAutoScale: true, // 防止部分情况下缩放导致模糊
-					cacheBust: true,     // 双重保险
+					skipAutoScale: true,
+					cacheBust: true,
 				});
 
-				// 6. 下载
 				const link = document.createElement('a');
 				link.href = dataUrl;
-				link.download = `年度动画分组_${Date.now()}.png`;
+				link.download = `年度动画分级_${Date.now()}.png`;
 				link.click();
-
 			} catch (e) {
 				console.error('导出图片失败:', e);
-				alert('导出失败：请检查网络或图片是否存在跨域限制。');
+				alert('导出失败：请检查网络，或确认图片服务允许跨域访问。');
 			} finally {
-				// 7. 清理 DOM
 				document.body.removeChild(container);
 				this.changesave();
 			}
@@ -392,7 +349,7 @@ export default {
 			const url = URL.createObjectURL(blob);
 			const a = document.createElement('a');
 			a.href = url;
-			a.download = 'items.json';
+			a.download = 'anime-tier-list.json';
 			a.click();
 			URL.revokeObjectURL(url);
 			this.changesave();
@@ -400,15 +357,13 @@ export default {
 		loadjson(json_object) {
 			store.LoadRankList(json_object);
 		},
-		
+
 		loadsortjson(json_object) {
 			store.LoadSortableList(json_object);
 		},
-		importnew() {
-
-		},
+		importnew() {},
 		handleFileUpload(event) {
-			const file = event.target.files[0]; // Get the first selected file
+			const file = event.target.files[0];
 			if (file) {
 				if (file.type === 'application/json') {
 					const reader = new FileReader();
@@ -416,11 +371,12 @@ export default {
 					reader.onload = (e) => {
 						try {
 							const json_file = JSON.parse(e.target.result);
-							this.loadjson(json_file.rank); // Parse JSON data
+							this.loadjson(json_file.rank);
 							this.loadsortjson(json_file.sortable);
 							this.changeimport();
 						} catch (error) {
 							console.error('Error parsing JSON:', error);
+							alert('JSON 解析失败，请检查文件内容。');
 						}
 					};
 
@@ -428,39 +384,35 @@ export default {
 						console.error('Error reading file:', error);
 					};
 
-					reader.readAsText(file); // Read file content as text
+					reader.readAsText(file);
 				} else {
-					alert('Please upload a valid JSON file.');
+					alert('请上传有效的 JSON 文件。');
 				}
 			}
 		},
-		// 编码数据为分享代码（更短）
 		encodeDataToCode() {
 			try {
 				const data = {
-				rank: store.ranklist,
-				sortable: store.sortablelist,
+					rank: store.ranklist,
+					sortable: store.sortablelist,
 				};
 				const jsonStr = JSON.stringify(data);
-
-				// 输出为 URL-safe 的压缩字符串（推荐）
 				const code = LZString.compressToEncodedURIComponent(jsonStr);
 
 				this.shareCode = code;
 				this.ifcodeshare = true;
 			} catch (error) {
 				console.error("编码失败:", error);
-				alert("编码失败，请重试");
+				alert("编码失败，请重试。");
 			}
 		},
 
-		// 从分享代码导入数据
 		decodeCodeToData() {
 			try {
 				const input = this.importCodeInput.trim();
 				if (!input) {
-				alert("请粘贴有效的代码");
-				return;
+					alert("请粘贴有效的分享码。");
+					return;
 				}
 
 				const jsonStr = LZString.decompressFromEncodedURIComponent(input);
@@ -476,34 +428,29 @@ export default {
 				this.changeimport();
 			} catch (error) {
 				console.error("解码失败:", error);
-				alert("代码无效或已损坏，请检查后重试");
+				alert("分享码无效或已损坏，请检查后重试。");
 			}
 		},
-		// 复制分享代码到剪贴板
 		copyShareCode() {
 			this.ifcodeshare = false;
 			navigator.clipboard.writeText(this.shareCode).then(() => {
-				alert('代码已复制到剪贴板！');
+				alert('分享码已复制到剪贴板！');
 			}).catch(err => {
 				console.error('复制失败:', err);
-				alert('复制失败，请手动复制');
+				alert('复制失败，请手动复制。');
 			});
 		},
-		// 打开分享代码界面
 		openCodeShare() {
 			this.encodeDataToCode();
 		},
-		// 打开导入代码界面
 		openCodeImport() {
 			this.importCodeInput = '';
 			this.ifcodeimport = true;
 		},
-		// 关闭导入代码界面
 		closeCodeImport() {
 			this.ifcodeimport = false;
 			this.importCodeInput = '';
 		},
-		// 关闭分享代码界面
 		closeCodeShare() {
 			this.ifcodeshare = false;
 			this.shareCode = '';
@@ -511,284 +458,361 @@ export default {
 	}
 };
 </script>
+
 <style scoped>
-.home {
-	display: block;
-	gap: 20px;
-	max-width: 1000px;
-	margin-left: auto;
-	margin-right: auto;
-	margin-top: 40px;
-	padding: 28px;
-	background-color: var(--card-bg);
-	border-radius: var(--radius);
-	box-shadow: 0 8px 30px rgba(15, 30, 50, 0.08);
-	border: 1px solid rgba(16,24,40,0.04);
+.app-root {
+	min-height: 100vh;
+	padding-bottom: 32px;
+	background:
+		radial-gradient(circle at top left, rgba(255, 139, 97, 0.18), transparent 32rem),
+		linear-gradient(135deg, #f7f9fc 0%, #eef4f8 45%, #fbfbf7 100%);
 }
 
 .site-header {
-	background: transparent;
-	padding: 12px 0 6px;
-	margin-bottom: 8px;
-	text-align: center;
+	padding: 38px 0 18px;
 }
-.site-header .container { max-width: 1100px; margin: 0 auto; }
+
+.header-inner {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 24px;
+}
+
+.eyebrow,
+.section-label {
+	margin: 0 0 6px;
+	color: #2b7286;
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0;
+	text-transform: uppercase;
+}
+
 .site-header h1 {
-	font-family: 'Noto Sans SC', 'Inter', sans-serif;
-	font-size: 22px;
 	margin: 0;
-	color: var(--color-heading, #243447);
-	font-weight: 600;
+	color: #1f2937;
+	font-size: clamp(32px, 6vw, 58px);
+	font-weight: 800;
+	line-height: 1.04;
 }
-.site-header .subtitle {
-	margin: 4px 0 0;
-	color: #6b7280;
+
+.subtitle {
+	max-width: 560px;
+	margin: 12px 0 0;
+	color: #5c6674;
+	font-size: 16px;
+}
+
+.header-stats {
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+}
+
+.header-stats span {
+	display: inline-flex;
+	align-items: center;
+	min-height: 34px;
+	padding: 0 12px;
+	border: 1px solid rgba(31, 41, 55, 0.08);
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.72);
+	color: #3f4b5a;
+	font-size: 13px;
+	font-weight: 700;
+	backdrop-filter: blur(10px);
+}
+
+.home {
+	max-width: 1120px;
+	margin: 0 auto;
+	padding: 22px;
+	background: rgba(255, 255, 255, 0.78);
+	border: 1px solid rgba(31, 41, 55, 0.08);
+	border-radius: 18px;
+	box-shadow: 0 24px 70px rgba(31, 41, 55, 0.12);
+	backdrop-filter: blur(16px);
+}
+
+.toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 18px;
+	margin-bottom: 20px;
+	padding: 14px;
+	border: 1px solid rgba(31, 41, 55, 0.08);
+	border-radius: 12px;
+	background: #ffffff;
+}
+
+.toolbar-copy {
+	display: grid;
+	gap: 2px;
+	color: #667085;
 	font-size: 13px;
 }
 
-.app-root {
-	min-height: 100vh;
-	padding-bottom: 30px;
-	background: transparent;
+.toolbar-copy strong {
+	color: #1f2937;
+	font-size: 16px;
+	font-weight: 800;
 }
 
-.opt {
-	margin-bottom: 18px;
-	text-align: right;
-	margin-right: 5px;
-}
-
-.writer{
-	margin-right: 5px;
-	margin-bottom: 15px;
-	margin-left: auto;
+.opt,
+.action-group {
 	display: flex;
+	align-items: center;
 	justify-content: flex-end;
-	font-size: 15px;
-	color: var(--muted);
+	gap: 8px;
+	flex-wrap: wrap;
 }
 
-.writer input {
-	width: auto;
-	min-width: 5px;
-	border: none;
-	background: transparent;
-	padding: 6px 8px;
-	outline: none;
-	font-size: 15px;
+.expanded {
+	flex-basis: 100%;
 }
 
-.imageranktable {
-	margin-top: 30px;
-	padding: 8px 0;
-}
-
-.tabletitle {
-	font-size: 28px;
-	font-weight: 600;
-	margin-bottom: 12px;
-	color: var(--primary-600);
-}
-.tablefooter{
-	font-size: 12px;
-	color: var(--muted);
-}
-.center {
-	display: flex;
-	justify-content: center;
-}
-
-button {
+.btn {
 	position: relative;
-	display: inline-block;
-	background: linear-gradient(180deg, var(--primary) 0%, var(--primary-600) 100%);
-	border: none;
-	color: white;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 38px;
+	border: 1px solid transparent;
 	border-radius: 8px;
-	padding: 8px 14px;
-	overflow: hidden;
-	text-decoration: none;
-	line-height: 20px;
+	padding: 0 14px;
+	background: #236f86;
+	color: white;
 	font-size: 14px;
+	font-weight: 700;
+	line-height: 1;
 	cursor: pointer;
-	box-shadow: 0 6px 18px rgba(47, 128, 237, 0.12);
-	transition: transform 0.12s ease, box-shadow 0.12s ease;
+	box-shadow: 0 8px 18px rgba(35, 111, 134, 0.18);
+	transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
 }
 
-button:hover {
-	transform: translateY(-3px);
-	box-shadow: 0 10px 24px rgba(47, 128, 237, 0.16);
+.btn:hover {
+	transform: translateY(-2px);
+	background: #19596d;
+	box-shadow: 0 12px 24px rgba(35, 111, 134, 0.22);
+}
+
+.btn-soft {
+	border-color: rgba(35, 111, 134, 0.16);
+	background: #eef7f8;
+	color: #19596d;
+	box-shadow: none;
+}
+
+.btn-soft:hover {
+	background: #dff0f2;
+	box-shadow: none;
+}
+
+.btn-secondary {
+	background: #46556a;
+	box-shadow: 0 8px 18px rgba(70, 85, 106, 0.18);
+}
+
+.btn-secondary:hover {
+	background: #334155;
+}
+
+.btn-danger-soft {
+	border-color: rgba(194, 65, 12, 0.18);
+	background: #fff3ed;
+	color: #9a3412;
+	box-shadow: none;
+}
+
+.btn-danger-soft:hover {
+	background: #ffe8dc;
+	box-shadow: none;
+}
+
+.file {
+	overflow: hidden;
 }
 
 .file input {
 	position: absolute;
+	inset: 0;
 	font-size: 100px;
-	right: 0;
-	top: 0;
 	opacity: 0;
+	cursor: pointer;
 }
 
+.imageranktable,
+.pool-panel {
+	background: #ffffff;
+	border: 1px solid rgba(31, 41, 55, 0.08);
+	border-radius: 14px;
+	padding: 16px;
+}
 
-/* 代码分享模态框样式 */
-.code-share-modal {
+.table-heading,
+.pool-heading {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 16px;
+	margin-bottom: 14px;
+}
+
+.table-heading h2,
+.pool-heading h2 {
+	margin: 0;
+	color: #1f2937;
+	font-size: 24px;
+	font-weight: 800;
+}
+
+.pool-panel {
+	margin-top: 18px;
+}
+
+.pool-heading span {
+	color: #667085;
+	font-size: 13px;
+}
+
+.writer {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 8px;
+	color: #667085;
+	font-size: 14px;
+}
+
+.writer input {
+	min-width: 9rem;
+	border: 1px solid rgba(31, 41, 55, 0.12);
+	background: #f8fafc;
+	padding: 8px 10px;
+	border-radius: 8px;
+	outline: none;
+	font-size: 14px;
+}
+
+.code-share-modal,
+.code-import-modal {
 	position: fixed;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	background: rgba(0, 0, 0, 0.5);
+	inset: 0;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	padding: 20px;
+	background: rgba(15, 23, 42, 0.54);
+	backdrop-filter: blur(8px);
 	z-index: 999;
 }
 
 .modal-content {
+	width: min(520px, 100%);
+	padding: 22px;
+	border-radius: 14px;
 	background: white;
-	border-radius: 12px;
-	padding: 24px;
-	max-width: 500px;
-	width: 90%;
-	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 24px 70px rgba(15, 23, 42, 0.28);
 }
 
 .modal-header {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 16px;
+	gap: 16px;
+	margin-bottom: 14px;
 }
 
 .modal-header h2 {
-	font-size: 20px;
 	margin: 0;
-	color: var(--primary-600);
+	color: #1f2937;
+	font-size: 20px;
+	font-weight: 800;
 }
 
 .close-btn {
-	background: none;
-	border: none;
-	font-size: 24px;
-	cursor: pointer;
-	color: var(--muted);
-	padding: 0;
-	width: 32px;
-	height: 32px;
-	display: flex;
+	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	border-radius: 6px;
-	transition: background 0.2s ease;
-}
-
-.close-btn:hover {
-	background: rgba(0, 0, 0, 0.05);
-	transform: none;
+	width: 34px;
+	height: 34px;
+	border: 1px solid rgba(31, 41, 55, 0.08);
+	border-radius: 8px;
+	background: #f8fafc;
+	color: #475467;
+	font-size: 22px;
+	line-height: 1;
+	cursor: pointer;
 	box-shadow: none;
 }
 
-.modal-body {
-	text-align: center;
+.close-btn:hover {
+	transform: none;
+	background: #eef2f6;
+	box-shadow: none;
 }
 
 .modal-hint {
+	margin: 0 0 12px;
+	color: #667085;
 	font-size: 14px;
-	color: var(--muted);
-	margin-bottom: 12px;
 }
 
-.share-code-textarea {
-	width: 80%;
-	height: 120px;
-	padding: 12px;
-	border: 1px solid rgba(16, 24, 40, 0.1);
-	border-radius: 8px;
-	font-family: monospace;
-	font-size: 12px;
-	resize: none;
-	margin-bottom: 12px;
-}
-
-.copy-btn {
-	width: 100%;
-	padding: 10px;
-	background: var(--primary);
-	color: white;
-	border: none;
-	border-radius: 8px;
-	cursor: pointer;
-	font-size: 14px;
-	transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-
-.copy-btn:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 8px 20px rgba(79, 156, 224, 0.2);
-}
-
-/* 代码导入模态框样式 */
-.code-import-modal {
-	position: fixed;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	background: rgba(0, 0, 0, 0.5);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	z-index: 998;
-}
-
-.modal-content-import {
-	background: white;
-	border-radius: 12px;
-	padding: 24px;
-	max-width: 500px;
-	width: 90%;
-	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-}
-
-.modal-body-import {
-	text-align: left;
-}
-
-.modal-body-import p {
-	margin-bottom: 12px;
-	font-size: 14px;
-	color: var(--muted);
-}
-
+.share-code-textarea,
 .import-code-textarea {
-	width: 80%;
-	height: 120px;
-	padding: 12px;
-	border: 1px solid rgba(16, 24, 40, 0.1);
-	border-radius: 8px;
-	font-family: monospace;
-	font-size: 12px;
-	resize: none;
-	margin-bottom: 12px;
-}
-
-.import-btn {
+	box-sizing: border-box;
 	width: 100%;
-	padding: 10px;
-	background: var(--primary);
-	color: white;
-	border: none;
-	border-radius: 8px;
-	cursor: pointer;
-	font-size: 14px;
-	transition: transform 0.12s ease, box-shadow 0.12s ease;
+	min-height: 132px;
+	padding: 12px;
+	border: 1px solid rgba(31, 41, 55, 0.12);
+	border-radius: 10px;
+	background: #f8fafc;
+	color: #1f2937;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 12px;
+	resize: vertical;
 }
 
-.import-btn:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 8px 20px rgba(79, 156, 224, 0.2);
-}
-.imageranktable{
-  background: #fff;
+.modal-action {
+	width: 100%;
+	margin-top: 12px;
 }
 
+@media (max-width: 760px) {
+	.site-header {
+		padding-top: 24px;
+	}
+
+	.header-inner,
+	.toolbar,
+	.table-heading,
+	.pool-heading {
+		align-items: stretch;
+		flex-direction: column;
+	}
+
+	.header-stats,
+	.opt,
+	.action-group {
+		justify-content: flex-start;
+	}
+
+	.home {
+		padding: 12px;
+		border-radius: 14px;
+	}
+
+	.imageranktable,
+	.pool-panel {
+		padding: 12px;
+		overflow-x: auto;
+	}
+
+	.btn {
+		flex: 1 1 auto;
+	}
+}
 </style>
