@@ -1,5 +1,13 @@
 <template>
-	<div class="home" @mouseup="change_event_handler">
+	<div class="app-root">
+		<header class="site-header">
+			<div class="container">
+				<h1>年度动画我来排</h1>
+				<p class="subtitle">把你喜欢的动画排成心中的排行榜</p>
+			</div>
+		</header>
+
+		<div class="home" @mouseup="change_event_handler">
 		<div class="opt">
 			<div class="in-output">
 				<button @click="writer" v-show="!ifimport && !ifsave">{{ writertitle }}</button>
@@ -45,8 +53,9 @@
 			<SortableImageList ref="sortableImageList" @opensearchbox="handleopensearchbox" />
 		</div>
 		<div ref="combinedContainer" class="combined-container" style="display: none"></div>
+		</div>
+		<AppFooter />
 	</div>
-	<AppFooter />
 </template>
 
 <script>
@@ -269,6 +278,32 @@ export default {
 	border-radius: 10px;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 	border: 1px solid #e0e0e0;
+}
+
+.site-header {
+	background: transparent;
+	padding: 12px 0 6px;
+	margin-bottom: 8px;
+	text-align: center;
+}
+.site-header .container { max-width: 1100px; margin: 0 auto; }
+.site-header h1 {
+	font-family: 'Noto Sans SC', 'Inter', sans-serif;
+	font-size: 22px;
+	margin: 0;
+	color: var(--color-heading, #243447);
+	font-weight: 600;
+}
+.site-header .subtitle {
+	margin: 4px 0 0;
+	color: #6b7280;
+	font-size: 13px;
+}
+
+.app-root {
+	min-height: 100vh;
+	padding-bottom: 30px;
+	background: transparent;
 }
 
 .opt {

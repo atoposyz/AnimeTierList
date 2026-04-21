@@ -36,15 +36,17 @@ export default {
 
 <style scoped>
 .footer {
-    padding: 20px;
+    padding: 24px 12px;
     text-align: center;
-    margin-top: 10px;
+    margin-top: 18px;
+    background: transparent;
+    color: #666;
 }
 
 .morelink{
-    font: 30px sans-serif;
-    margin-bottom: 30px;
-    color: #666;
+    font: 26px 'Noto Sans SC', 'Inter', sans-serif;
+    margin-bottom: 18px;
+    color: #4b5563;
 }
 
 .center {
@@ -67,4 +69,7 @@ export default {
     margin-top: 0;
     font-size: 0.9em;
 }
+
+.footer a { color: #2b6cb0; }
+.footer a:hover { text-decoration: underline; }
 </style>
